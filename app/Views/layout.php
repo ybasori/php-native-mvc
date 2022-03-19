@@ -19,6 +19,14 @@
     <?php endif; ?>
 
 
+    <style>
+        html,
+        body,
+        #root {
+            width: 100% !important;
+            height: 100% !important;
+        }
+    </style>
 
 
     <script defer src="/assets/js/app.bundle.js"></script>

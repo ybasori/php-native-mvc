@@ -15,10 +15,14 @@ module.exports = merge(common, {
     hot: true,
     proxy: {
       "*": {
-        target: `http://0.0.0.0:8000/`,
+        target: `http://0.0.0.0:8000`,
         changeOrigin: true,
         // secure: true,
       },
     },
+  },
+  output: {
+    clean: true,
+    publicPath: `http://localhost:3000/assets`,
   },
 });

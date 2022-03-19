@@ -1,0 +1,15 @@
+.alert {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  max-width: 240px;
+}
+
+.notification {
+  opacity: 0;
+
+  transition: opacity 0.5s;
+  &.active {
+    opacity: 1;
+  }
+}
