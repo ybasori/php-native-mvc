@@ -16,5 +16,5 @@ ini_set("display_errors", "0");
 // register_shutdown_function([\System\HandleError::onError(), "onError"]);
 
 
-// require_once __DIR__ . '/../system/Functions.php';
-// require_once __DIR__ . '/../app/routes.php';
+require_once __DIR__ . '/../system/Functions.php';
+require_once __DIR__ . '/../app/routes.php';
