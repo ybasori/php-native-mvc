@@ -22,6 +22,8 @@ class HandleError
         if ($isError) {
             return self::json($error, 500);
         }
+
+        return null;
     }
 
     private static function json($data = [], $statusCode = 200)
