@@ -1,0 +1,21 @@
+{
+  "name": "yusuf/php-react",
+  "authors": [
+    {
+      "name": "Yusuf",
+      "email": "ybasori@gmail.com"
+    }
+  ],
+  "require": {
+    "guzzlehttp/guzzle": "^7.0",
+    "firebase/php-jwt": "^5.5",
+    "vlucas/phpdotenv": "^5.4",
+    "ramsey/uuid": "^4.2"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "app/",
+      "System\\": "system/"
+    }
+  }
+}
