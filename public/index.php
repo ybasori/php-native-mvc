@@ -9,11 +9,11 @@ if (file_exists(__DIR__ . '/../.env')) {
     $dotenv->load();
 }
 
-// error_reporting(E_ALL);
+error_reporting(E_ALL);
 
-// ini_set("display_errors", "0");
+ini_set("display_errors", "0");
 
-// register_shutdown_function([\System\HandleError::onError(), "onError"]);
+register_shutdown_function([\System\HandleError::onError(), "onError"]);
 
 
 // require_once __DIR__ . '/../system/Functions.php';
