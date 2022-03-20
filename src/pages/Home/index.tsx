@@ -1,5 +1,4 @@
-import React from // useState
-"react";
+import React from "react"; // useState
 import { Link } from "react-router-dom";
 // import { useAlert } from "../../components/Alert";
 // import Box from "../../components/Box";
@@ -28,19 +27,21 @@ const Home = () => {
   //   setCounter(newCounter);
   // };
   return (
-    <div className="container">
-      <div className="columns">
-        <div className="column">
-          <Link to="/marvel">Marvel</Link>
-        </div>
-        <div className="column">
-          <Link to="/movies">Movies</Link>
-        </div>
-        <div className="column">
-          <Link to="/tvs">TVs</Link>
+    <section className="section">
+      <div className="container">
+        <div className="columns">
+          <div className="column">
+            <Link to="/marvel">Marvel</Link>
+          </div>
+          <div className="column">
+            <Link to="/movies">Movies</Link>
+          </div>
+          <div className="column">
+            <Link to="/tvs">TV Shows</Link>
+          </div>
         </div>
       </div>
-    </div>
+    </section>
   );
 };
 
