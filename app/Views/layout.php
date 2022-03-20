@@ -22,11 +22,11 @@
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
 
-    <script defer src="/assets/js/app.bundle.js"></script>
-    <script defer src="/assets/js/runtime.bundle.js"></script>
-    <script defer src="/assets/js/shared.bundle.js"></script>
-    <script defer src="/assets/js/shared-dom.bundle.js"></script>
-    <script defer src="/assets/js/shared-router-dom.bundle.js"></script>
+    <script defer src="/assets/js/app.bundle.js?<?= date("s"); ?>"></script>
+    <script defer src="/assets/js/runtime.bundle.js?<?= date("s"); ?>"></script>
+    <script defer src="/assets/js/shared.bundle.js?<?= date("s"); ?>"></script>
+    <script defer src="/assets/js/shared-dom.bundle.js?<?= date("s"); ?>"></script>
+    <script defer src="/assets/js/shared-router-dom.bundle.js?<?= date("s"); ?>"></script>
 </head>
 
 <body>
