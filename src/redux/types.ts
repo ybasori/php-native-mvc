@@ -9,10 +9,52 @@ export type Logger = (store: {
 
 export type Dispatch = (data: Action) => null;
 
-export interface BlankState {
-  blank: null;
+export interface MarvelState {
+  character: {
+    data: any;
+    isLoading: boolean;
+    error: any;
+  };
+  comics: {
+    data: any;
+    isLoading: boolean;
+    error: any;
+  };
+  creators: {
+    data: any;
+    isLoading: boolean;
+    error: any;
+  };
+  events: {
+    data: any;
+    isLoading: boolean;
+    error: any;
+  };
+  series: {
+    data: any;
+    isLoading: boolean;
+    error: any;
+  };
+  stories: {
+    data: any;
+    isLoading: boolean;
+    error: any;
+  };
+}
+export interface MovieDBState {
+  popularMovies: {
+    data: any;
+    isLoading: boolean;
+    error: any;
+  };
+  popularTVs: {
+    data: any;
+    isLoading: boolean;
+    error: any;
+  };
 }
 
 export interface Reducers {
-  blank: BlankState;
+  marvel: MarvelState;
+  moviedb: MovieDBState;
 }

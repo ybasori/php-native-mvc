@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import "./style.scss";
 
 const Navbar = () => {
@@ -25,14 +25,13 @@ const Navbar = () => {
         aria-label="main navigation"
       >
         <div className="navbar-brand">
-          <a className="navbar-item" href="https://bulma.io">
+          <Link className="navbar-item" to="/">
             <img
               src="https://bulma.io/images/bulma-logo-white.png"
               width="112"
               height="28"
             />
-          </a>
-
+          </Link>
           <a
             role="button"
             className={`navbar-burger ${isOpen && "is-active"}`}
@@ -99,16 +98,16 @@ const Navbar = () => {
             </div>
           </div>
         </div>
+        {activeDropdown.length > 0 && (
+          <div
+            className="navbar-bg"
+            onClick={() => setActiveDropdown([...[]])}
+          ></div>
+        )}
+        {isOpen && (
+          <div className="navbar-bg" onClick={() => setIsOpen(false)}></div>
+        )}
       </nav>
-      {activeDropdown.length > 0 && (
-        <div
-          className="navbar-bg"
-          onClick={() => setActiveDropdown([...[]])}
-        ></div>
-      )}
-      {isOpen && (
-        <div className="navbar-bg" onClick={() => setIsOpen(false)}></div>
-      )}
     </>
   );
 };

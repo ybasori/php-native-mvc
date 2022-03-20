@@ -1,6 +1,6 @@
 import React, { ReactChild, useEffect, useState, useCallback } from "react";
 import Alert from "../Alert";
-import { AlertDataProps, ColorProps, MessageProps } from "../types";
+import { AlertDataProps, SetAlertProps } from "../types";
 import AlertContext from "./AlertContext";
 import "../style.scss";
 
@@ -16,11 +16,14 @@ const AlertProvider: React.FC<AlertProviderProps> = ({
   const [counterSecond, setCounterSecond] = useState(0);
   const [alertData, setAlertData] = useState<AlertDataProps[]>([]);
 
-  const setAlert = (
-    data: MessageProps,
-    color: ColorProps = "default",
-    time = 1500
+  const setAlert: SetAlertProps = (
+    data,
+    config = {
+      color: "default",
+      time: 1500,
+    }
   ) => {
+    const { color, time = 1500 } = config;
     const dt = new Date();
     const newData = {
       id: `alert-${dt.getTime()}-${alertData.length}`,

@@ -34,6 +34,14 @@ export interface AlertDataProps extends SetAlertDataProps {
   id: string;
 }
 
+export type SetAlertProps = (
+  data: MessageProps,
+  config?: {
+    color?: ColorProps;
+    time?: number;
+  }
+) => void;
+
 export interface AlertContextProps {
-  setAlert: (data: MessageProps, color?: ColorProps, time?: number) => void;
+  setAlert: SetAlertProps;
 }

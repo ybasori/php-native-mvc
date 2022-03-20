@@ -2,9 +2,10 @@ import { combineReducers, createStore, applyMiddleware } from "redux";
 import thunk from "redux-thunk";
 
 import { Logger } from "./types";
-import blank from "./blank";
+import marvel from "./marvel";
+import moviedb from "./moviedb";
 
-const reducer = combineReducers({ blank });
+const reducer = combineReducers({ marvel, moviedb });
 
 const logger: Logger =
   ({ getState }) =>
