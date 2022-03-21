@@ -22,6 +22,7 @@ const Character = () => {
 
   return (
     <>
+      <h2 className="subtitle">Characters</h2>
       <div className="columns is-multiline is-desktop">
         {marvel.character.data &&
           marvel.character.data.map(

@@ -22,6 +22,7 @@ const Events = () => {
 
   return (
     <>
+      <h2 className="subtitle">Events</h2>
       <div className="columns is-multiline is-desktop">
         {marvel.events.data &&
           marvel.events.data.map(

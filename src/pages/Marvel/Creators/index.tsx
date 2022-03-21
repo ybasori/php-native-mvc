@@ -22,6 +22,7 @@ const Creators = () => {
 
   return (
     <>
+      <h2 className="subtitle">Creators</h2>
       <div className="columns is-multiline is-desktop">
         {marvel.creators.data &&
           marvel.creators.data.map(
