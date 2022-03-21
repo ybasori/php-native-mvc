@@ -54,7 +54,20 @@ export interface MovieDBState {
   };
 }
 
+export interface PokemonState {
+  allPokemon: {
+    data: any;
+    isLoading: boolean;
+    error: any;
+    page: {
+      limit: number;
+      offset: number;
+    };
+  };
+}
+
 export interface Reducers {
   marvel: MarvelState;
   moviedb: MovieDBState;
+  pokemon: PokemonState;
 }

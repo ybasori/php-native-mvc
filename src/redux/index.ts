@@ -4,8 +4,9 @@ import thunk from "redux-thunk";
 import { Logger } from "./types";
 import marvel from "./marvel";
 import moviedb from "./moviedb";
+import pokemon from "./pokemon";
 
-const reducer = combineReducers({ marvel, moviedb });
+const reducer = combineReducers({ marvel, moviedb, pokemon });
 
 const logger: Logger =
   ({ getState }) =>

@@ -4,8 +4,8 @@ use System\Router;
 
 use App\Controllers\HomeController;
 use App\Controllers\Api\V1\MarvelController;
-
 use App\Controllers\Api\V1\MovieDBController;
+use App\Controllers\Api\V1\PokemonController;
 
 $router = new Router();
 
@@ -20,5 +20,8 @@ $router->get("/api/v1/marvel/stories", [MarvelController::class, 'stories']);
 
 $router->get("/api/v1/moviedb/popular-movies", [MovieDBController::class, 'popularMovies']);
 $router->get("/api/v1/moviedb/popular-tvs", [MovieDBController::class, 'popularTVs']);
+
+$router->get("/api/v1/pokemon", [PokemonController::class, 'allPokemon']);
+$router->get("/api/v1/pokemon/:id", [PokemonController::class, 'pokemon']);
 
 $router->run();

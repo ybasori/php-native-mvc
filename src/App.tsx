@@ -12,6 +12,7 @@ import { AlertProvider } from "./components/Alert";
 
 const Home = lazy(() => import("./pages/Home"));
 const About = lazy(() => import("./pages/About"));
+const Pokemon = lazy(() => import("./pages/Pokemon"));
 const Movies = lazy(() => import("./pages/Movies"));
 const TVs = lazy(() => import("./pages/TVs"));
 const Marvel = lazy(() => import("./pages/Marvel"));
@@ -35,6 +36,7 @@ export default function App() {
                   <Route index element={<Home />} />
                   <Route path="about" element={<About />} />
                   <Route path="movies" element={<Movies />} />
+                  <Route path="pokemon" element={<Pokemon />} />
                   <Route path="tvs" element={<TVs />} />
                   <Route path="marvel" element={<Marvel />}>
                     <Route path="characters" element={<MarvelCharacters />} />

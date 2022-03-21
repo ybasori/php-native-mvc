@@ -94,7 +94,8 @@ export const getPopularMovies =
     try {
       const { moviedb } = getState();
       dispatch({ type: GET_POPULAR_MOVIES_LOADING });
-      const res = await api.getPopularMovies({ page });
+      const result = await api.getPopularMovies({ page });
+      const res = await result.json();
 
       dispatch({
         type: GET_POPULAR_MOVIES_SUCCESS,
@@ -114,7 +115,8 @@ export const getPopularTVs =
     try {
       const { moviedb } = getState();
       dispatch({ type: GET_POPULAR_TVS_LOADING });
-      const res = await api.getPopularTVs({ page });
+      const result = await api.getPopularTVs({ page });
+      const res = await result.json();
 
       dispatch({
         type: GET_POPULAR_TVS_SUCCESS,

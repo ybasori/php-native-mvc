@@ -29,15 +29,26 @@ const Home = () => {
   return (
     <section className="section">
       <div className="container">
-        <div className="columns">
+        <div className="columns is-multiline is-desktop">
           <div className="column">
-            <Link to="/marvel">Marvel</Link>
+            <div className="box is-justify-content-center is-flex-direction-column is-flex">
+              <Link to="/movies">Movies</Link>
+            </div>
           </div>
           <div className="column">
-            <Link to="/movies">Movies</Link>
+            <div className="box is-justify-content-center is-flex-direction-column is-flex">
+              <Link to="/tvs">TV Shows</Link>
+            </div>
           </div>
           <div className="column">
-            <Link to="/tvs">TV Shows</Link>
+            <div className="box is-justify-content-center is-flex-direction-column is-flex">
+              <Link to="/pokemon">Pokemon</Link>
+            </div>
+          </div>
+          <div className="column">
+            <div className="box is-justify-content-center is-flex-direction-column is-flex">
+              <Link to="/marvel">Marvel</Link>
+            </div>
           </div>
         </div>
       </div>

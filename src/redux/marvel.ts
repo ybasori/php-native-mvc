@@ -241,11 +241,14 @@ export const getMarvelCharacter =
     try {
       const { marvel } = getState();
       dispatch({ type: GET_MARVEL_CHARACTERS_LOADING });
-      const res = await api.getMarvelCharacter({ limit, offset });
+      const result = await api.getMarvelCharacter({ limit, offset });
+      const res = await result.json();
+
+      const dt = marvel.comics.data || [];
 
       dispatch({
         type: GET_MARVEL_CHARACTERS_SUCCESS,
-        payload: [...(marvel.character.data || []), ...res.data.results],
+        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
       });
     } catch (err) {
       dispatch({
@@ -261,11 +264,14 @@ export const getMarvelComics =
     try {
       const { marvel } = getState();
       dispatch({ type: GET_MARVEL_COMICS_LOADING });
-      const res = await api.getMarvelComics({ limit, offset });
+      const result = await api.getMarvelComics({ limit, offset });
+      const res = await result.json();
+
+      const dt = marvel.comics.data || [];
 
       dispatch({
         type: GET_MARVEL_COMICS_SUCCESS,
-        payload: [...(marvel.comics.data || []), ...res.data.results],
+        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
       });
     } catch (err) {
       dispatch({
@@ -281,11 +287,14 @@ export const getMarvelCreators =
     try {
       const { marvel } = getState();
       dispatch({ type: GET_MARVEL_CREATORS_LOADING });
-      const res = await api.getMarvelCreators({ limit, offset });
+      const result = await api.getMarvelCreators({ limit, offset });
+      const res = await result.json();
+
+      const dt = marvel.creators.data || [];
 
       dispatch({
         type: GET_MARVEL_CREATORS_SUCCESS,
-        payload: [...(marvel.creators.data || []), ...res.data.results],
+        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
       });
     } catch (err) {
       dispatch({
@@ -301,11 +310,14 @@ export const getMarvelEvents =
     try {
       const { marvel } = getState();
       dispatch({ type: GET_MARVEL_EVENTS_LOADING });
-      const res = await api.getMarvelEvents({ limit, offset });
+      const result = await api.getMarvelEvents({ limit, offset });
+      const res = await result.json();
+
+      const dt = marvel.events.data || [];
 
       dispatch({
         type: GET_MARVEL_EVENTS_SUCCESS,
-        payload: [...(marvel.events.data || []), ...res.data.results],
+        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
       });
     } catch (err) {
       dispatch({
@@ -321,11 +333,14 @@ export const getMarvelSeries =
     try {
       const { marvel } = getState();
       dispatch({ type: GET_MARVEL_SERIES_LOADING });
-      const res = await api.getMarvelSeries({ limit, offset });
+      const result = await api.getMarvelSeries({ limit, offset });
+      const res = await result.json();
+
+      const dt = marvel.series.data || [];
 
       dispatch({
         type: GET_MARVEL_SERIES_SUCCESS,
-        payload: [...(marvel.series.data || []), ...res.data.results],
+        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
       });
     } catch (err) {
       dispatch({
@@ -341,11 +356,14 @@ export const getMarvelStories =
     try {
       const { marvel } = getState();
       dispatch({ type: GET_MARVEL_STORIES_LOADING });
-      const res = await api.getMarvelStories({ limit, offset });
+      const result = await api.getMarvelStories({ limit, offset });
+      const res = await result.json();
+
+      const dt = marvel.stories.data || [];
 
       dispatch({
         type: GET_MARVEL_STORIES_SUCCESS,
-        payload: [...(marvel.stories.data || []), ...res.data.results],
+        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
       });
     } catch (err) {
       dispatch({
