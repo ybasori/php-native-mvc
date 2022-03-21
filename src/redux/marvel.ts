@@ -244,7 +244,7 @@ export const getMarvelCharacter =
       const result = await api.getMarvelCharacter({ limit, offset });
       const res = await result.json();
 
-      const dt = marvel.comics.data || [];
+      const dt = marvel.character.data || [];
 
       dispatch({
         type: GET_MARVEL_CHARACTERS_SUCCESS,
