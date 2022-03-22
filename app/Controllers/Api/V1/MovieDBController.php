@@ -16,7 +16,7 @@ class MovieDBController extends Controller
     function __construct()
     {
         $this->client = new Client;
-        $this->apiKey = "af1878ff2a4c7a3b7bdce9c0e439fe48";
+        $this->apiKey = $_ENV['MOVIEDB_API_KEY'];
     }
 
     public function popularMovies()

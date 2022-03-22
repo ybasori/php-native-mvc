@@ -5,8 +5,9 @@ import { Logger } from "./types";
 import marvel from "./marvel";
 import moviedb from "./moviedb";
 import pokemon from "./pokemon";
+import spotify from "./spotify";
 
-const reducer = combineReducers({ marvel, moviedb, pokemon });
+const reducer = combineReducers({ marvel, moviedb, pokemon, spotify });
 
 const logger: Logger =
   ({ getState }) =>

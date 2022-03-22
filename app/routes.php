@@ -6,6 +6,7 @@ use App\Controllers\HomeController;
 use App\Controllers\Api\V1\MarvelController;
 use App\Controllers\Api\V1\MovieDBController;
 use App\Controllers\Api\V1\PokemonController;
+use App\Controllers\Api\V1\SpotifyController;
 
 $router = new Router();
 
@@ -23,5 +24,9 @@ $router->get("/api/v1/moviedb/popular-tvs", [MovieDBController::class, 'popularT
 
 $router->get("/api/v1/pokemon", [PokemonController::class, 'allPokemon']);
 $router->get("/api/v1/pokemon/:id", [PokemonController::class, 'pokemon']);
+
+$router->post("/api/v1/spotify/login", [SpotifyController::class, 'login']);
+$router->post("/api/v1/spotify/refresh", [SpotifyController::class, 'refresh']);
+$router->get("/api/v1/spotify/search", [SpotifyController::class, 'search']);
 
 $router->run();

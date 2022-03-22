@@ -37,7 +37,7 @@ const Home = () => {
           </div>
           <div className="column">
             <div className="box is-justify-content-center is-flex-direction-column is-flex">
-              <Link to="/tvs">TV Shows</Link>
+              <Link to="/tv-shows">TV Shows</Link>
             </div>
           </div>
           <div className="column">
@@ -48,6 +48,11 @@ const Home = () => {
           <div className="column">
             <div className="box is-justify-content-center is-flex-direction-column is-flex">
               <Link to="/marvel">Marvel</Link>
+            </div>
+          </div>
+          <div className="column">
+            <div className="box is-justify-content-center is-flex-direction-column is-flex">
+              <Link to="/spotify">Spotify</Link>
             </div>
           </div>
         </div>

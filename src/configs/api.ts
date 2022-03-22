@@ -35,6 +35,35 @@ const api = {
   getMarvelStories: ({ limit, offset }: { limit: number; offset: number }) => {
     return fetch(`/api/v1/marvel/stories?limit=${limit}&offset=${offset}`);
   },
+  postSpotifyLogin: ({ code }: { code: string }) => {
+    const form = new FormData();
+    form.append("code", code);
+    return fetch(`/api/v1/spotify/login`, {
+      method: "POST",
+      body: form,
+    });
+  },
+  postSpotifyRefresh: ({ refresh_token }: { refresh_token: string }) => {
+    const form = new FormData();
+    form.append("refresh_token", refresh_token);
+    return fetch(`/api/v1/spotify/refresh`, {
+      method: "POST",
+      body: form,
+    });
+  },
+  getSpotifySearch: ({
+    q,
+    type,
+    headers,
+  }: {
+    q: string;
+    type: string;
+    headers: { Authorization: string };
+  }) => {
+    return fetch(`/api/v1/spotify/search?q=${q}&type=${type}`, {
+      headers,
+    });
+  },
 };
 
 export default api;

@@ -15,9 +15,9 @@ class MarvelController extends Controller
     function __construct()
     {
         $this->client = new Client;
-        $this->ts = "1625134934096";
-        $this->publicKey = "2937e16ac1c161b358cc7f72096477cb";
-        $this->hash = "15fccf32d2c1eb7feedd98f15797cd80";
+        $this->ts = time() * 1000;
+        $this->publicKey = $_ENV['MARVEL_PUBLIC_KEY'];
+        $this->hash = md5($this->ts . $_ENV["MARVEL_PRIVATE_KEY"] . $this->publicKey);
     }
 
     public function characters()
@@ -31,6 +31,7 @@ class MarvelController extends Controller
 
             return $this->json([
                 "message" => "Success",
+                "time" => time(),
                 "data" => json_decode($body->getContents())->data
             ]);
         } catch (ClientException $e) {

@@ -66,8 +66,24 @@ export interface PokemonState {
   };
 }
 
+export interface SpotifyState {
+  auth: {
+    isLoading: boolean;
+    data: any;
+    error: any;
+    expiresAt: number;
+  };
+  search: {
+    time: number;
+    isLoading: boolean;
+    data: any;
+    error: any;
+  };
+}
+
 export interface Reducers {
   marvel: MarvelState;
   moviedb: MovieDBState;
   pokemon: PokemonState;
+  spotify: SpotifyState;
 }

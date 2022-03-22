@@ -5,7 +5,7 @@ import Button from "../../components/Button";
 import { getPopularTVs } from "../../redux/moviedb";
 import { Reducers } from "../../redux/types";
 
-const TVs = () => {
+const TvShow = () => {
   const [page, setPage] = useState(1);
   const { moviedb } = useSelector((state: Reducers) => state);
   const dispatch = useDispatch();
@@ -23,7 +23,7 @@ const TVs = () => {
       <section className="section">
         <div className="container">
           <h1 className="title">
-            <Link to="/tvs">TV Shows</Link>
+            <Link to="/tv-shows">TV Shows</Link>
           </h1>
           <div className="columns is-multiline is-desktop">
             {moviedb.popularTVs.data &&
@@ -70,4 +70,4 @@ const TVs = () => {
   );
 };
 
-export default TVs;
+export default TvShow;
