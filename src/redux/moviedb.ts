@@ -4,10 +4,12 @@ import { Action, Dispatch, MovieDBState, Reducers } from "./types";
 const GET_POPULAR_MOVIES_LOADING = "GET_POPULAR_MOVIES_LOADING";
 const GET_POPULAR_MOVIES_SUCCESS = "GET_POPULAR_MOVIES_SUCCESS";
 const GET_POPULAR_MOVIES_ERROR = "GET_POPULAR_MOVIES_ERROR";
+const GET_POPULAR_MOVIES_RESET = "GET_POPULAR_MOVIES_RESET";
 
 const GET_POPULAR_TVS_LOADING = "GET_POPULAR_TVS_LOADING";
 const GET_POPULAR_TVS_SUCCESS = "GET_POPULAR_TVS_SUCCESS";
 const GET_POPULAR_TVS_ERROR = "GET_POPULAR_TVS_ERROR";
+const GET_POPULAR_TVS_RESET = "GET_POPULAR_TVS_RESET";
 
 const initState: MovieDBState = {
   popularMovies: {
@@ -52,6 +54,15 @@ const moviedb = (state = initState, action: Action) => {
           error: action.payload,
         },
       };
+    case GET_POPULAR_MOVIES_RESET:
+      return {
+        ...state,
+        popularMovies: {
+          ...state.popularMovies,
+          isLoading: false,
+          error: null,
+        },
+      };
     case GET_POPULAR_TVS_LOADING:
       return {
         ...state,
@@ -80,6 +91,15 @@ const moviedb = (state = initState, action: Action) => {
           error: action.payload,
         },
       };
+    case GET_POPULAR_TVS_RESET:
+      return {
+        ...state,
+        popularTVs: {
+          ...state.popularTVs,
+          isLoading: false,
+          error: null,
+        },
+      };
 
     default:
       return { ...state };
@@ -97,10 +117,19 @@ export const getPopularMovies =
       const result = await api.getPopularMovies({ page });
       const res = await result.json();
 
-      dispatch({
-        type: GET_POPULAR_MOVIES_SUCCESS,
-        payload: [...(moviedb.popularMovies.data || []), ...res.data.results],
-      });
+      if (result.status < 400) {
+        const dt = moviedb.popularMovies.data || [];
+
+        dispatch({
+          type: GET_POPULAR_MOVIES_SUCCESS,
+          payload: [...(page == 1 ? [] : dt), ...res.data.results],
+        });
+      } else {
+        dispatch({
+          type: GET_POPULAR_MOVIES_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_POPULAR_MOVIES_ERROR,
@@ -108,6 +137,10 @@ export const getPopularMovies =
       });
     }
   };
+
+export const getPopularMoviesReset = () => async (dispatch: Dispatch) => {
+  dispatch({ type: GET_POPULAR_MOVIES_RESET });
+};
 
 export const getPopularTVs =
   ({ page }: { page: number }) =>
@@ -118,10 +151,19 @@ export const getPopularTVs =
       const result = await api.getPopularTVs({ page });
       const res = await result.json();
 
-      dispatch({
-        type: GET_POPULAR_TVS_SUCCESS,
-        payload: [...(moviedb.popularTVs.data || []), ...res.data.results],
-      });
+      if (result.status < 400) {
+        const dt = moviedb.popularTVs.data || [];
+
+        dispatch({
+          type: GET_POPULAR_TVS_SUCCESS,
+          payload: [...(page == 1 ? [] : dt), ...res.data.results],
+        });
+      } else {
+        dispatch({
+          type: GET_POPULAR_TVS_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_POPULAR_TVS_ERROR,
@@ -129,3 +171,7 @@ export const getPopularTVs =
       });
     }
   };
+
+export const getPopularTVsReset = () => async (dispatch: Dispatch) => {
+  dispatch({ type: GET_POPULAR_TVS_RESET });
+};

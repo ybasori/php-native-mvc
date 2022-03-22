@@ -4,6 +4,7 @@ import { Action, Dispatch, PokemonState, Reducers } from "./types";
 const GET_ALL_POKEMON_LOADING = "GET_ALL_POKEMON_LOADING";
 const GET_ALL_POKEMON_SUCCESS = "GET_ALL_POKEMON_SUCCESS";
 const GET_ALL_POKEMON_ERROR = "GET_ALL_POKEMON_ERROR";
+const GET_ALL_POKEMON_RESET = "GET_ALL_POKEMON_RESET";
 
 const initState: PokemonState = {
   allPokemon: {
@@ -47,6 +48,15 @@ const pokemon = (state = initState, action: Action) => {
           error: action.payload,
         },
       };
+    case GET_ALL_POKEMON_RESET:
+      return {
+        ...state,
+        allPokemon: {
+          ...state.allPokemon,
+          isLoading: false,
+          error: null,
+        },
+      };
 
     default:
       return { ...state };
@@ -64,12 +74,19 @@ export const getAllPokemon =
       const result = await api.getAllPokemon({ limit, offset });
       const res = await result.json();
 
-      const allPokemon = pokemon.allPokemon.data || [];
+      if (result.status < 400) {
+        const allPokemon = pokemon.allPokemon.data || [];
 
-      dispatch({
-        type: GET_ALL_POKEMON_SUCCESS,
-        payload: [...(offset == 0 ? [] : allPokemon), ...res.data.results],
-      });
+        dispatch({
+          type: GET_ALL_POKEMON_SUCCESS,
+          payload: [...(offset == 0 ? [] : allPokemon), ...res.data.results],
+        });
+      } else {
+        dispatch({
+          type: GET_ALL_POKEMON_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_ALL_POKEMON_ERROR,
@@ -87,18 +104,25 @@ export const getPokemon =
       const result = await api.getPokemon({ id });
       const res = await result.json();
 
-      // eslint-disable-next-line prefer-const
-      let allPokemon = pokemon.allPokemon.data || [];
-      const index = allPokemon.findIndex(
-        (item: { name: string }) => item.name === id
-      );
+      if (result.status < 400) {
+        // eslint-disable-next-line prefer-const
+        let allPokemon = pokemon.allPokemon.data || [];
+        const index = allPokemon.findIndex(
+          (item: { name: string }) => item.name === id
+        );
 
-      allPokemon[index] = res.data;
+        allPokemon[index] = res.data;
 
-      dispatch({
-        type: GET_ALL_POKEMON_SUCCESS,
-        payload: [...allPokemon],
-      });
+        dispatch({
+          type: GET_ALL_POKEMON_SUCCESS,
+          payload: [...allPokemon],
+        });
+      } else {
+        dispatch({
+          type: GET_ALL_POKEMON_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_ALL_POKEMON_ERROR,
@@ -106,3 +130,7 @@ export const getPokemon =
       });
     }
   };
+
+export const getPokemonAllReset = () => async (dispatch: Dispatch) => {
+  dispatch({ type: GET_ALL_POKEMON_RESET });
+};

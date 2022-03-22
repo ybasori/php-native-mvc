@@ -23,6 +23,6 @@ module.exports = merge(common, {
   },
   output: {
     clean: true,
-    publicPath: `http://localhost:3000/assets`,
+    publicPath: `http://localhost:3000/assets/`,
   },
 });

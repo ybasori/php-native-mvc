@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "../../../components/Button";
-import { getMarvelCharacter } from "../../../redux/marvel";
+import { getMarvelCharacter, getMarvelReset } from "../../../redux/marvel";
 import { Reducers } from "../../../redux/types";
 
 const Character = () => {
@@ -9,6 +9,7 @@ const Character = () => {
     limit: 20,
     offset: 0,
   });
+  const [isError, setIsError] = useState(false);
   const { marvel } = useSelector((state: Reducers) => state);
   const dispatch = useDispatch();
 
@@ -16,9 +17,23 @@ const Character = () => {
     setPage((prev) => ({ ...prev, offset: prev.offset + prev.limit }));
   };
 
+  const onReload = () => {
+    setIsError(false);
+  };
+
   useEffect(() => {
-    dispatch(getMarvelCharacter({ ...page }));
-  }, [dispatch, page]);
+    if (!isError) {
+      dispatch(getMarvelCharacter({ ...page }));
+    } else {
+      dispatch(getMarvelReset("character"));
+    }
+  }, [dispatch, isError, page]);
+
+  useEffect(() => {
+    if (marvel.character.error) {
+      setIsError(true);
+    }
+  }, [dispatch, marvel.character.error]);
 
   return (
     <>
@@ -40,7 +55,6 @@ const Character = () => {
                 <div className="box is-justify-content-center is-flex-direction-column is-flex">
                   {item.thumbnail && (
                     <img
-                      v-if="data.thumbnail"
                       src={`${item.thumbnail.path}/portrait_xlarge.${item.thumbnail.extension}`}
                     />
                   )}
@@ -53,7 +67,15 @@ const Character = () => {
           )}
       </div>
       {marvel.character.isLoading && <p>Loading ...</p>}
-      <Button onClick={onLoadMore}>See More</Button>
+      {!marvel.character.isLoading && (
+        <>
+          {isError ? (
+            <Button onClick={onReload}>Reload</Button>
+          ) : (
+            <Button onClick={onLoadMore}>See More</Button>
+          )}
+        </>
+      )}
     </>
   );
 };

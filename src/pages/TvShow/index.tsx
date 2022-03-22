@@ -2,11 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Button from "../../components/Button";
-import { getPopularTVs } from "../../redux/moviedb";
+import { getPopularTVs, getPopularTVsReset } from "../../redux/moviedb";
 import { Reducers } from "../../redux/types";
 
 const TvShow = () => {
   const [page, setPage] = useState(1);
+  const [isError, setIsError] = useState(false);
   const { moviedb } = useSelector((state: Reducers) => state);
   const dispatch = useDispatch();
 
@@ -14,9 +15,23 @@ const TvShow = () => {
     setPage((prev) => prev + 1);
   };
 
+  const onReload = () => {
+    setIsError(false);
+  };
+
   useEffect(() => {
-    dispatch(getPopularTVs({ page }));
-  }, [dispatch, page]);
+    if (!isError) {
+      dispatch(getPopularTVs({ page }));
+    } else {
+      dispatch(getPopularTVsReset());
+    }
+  }, [dispatch, isError, page]);
+
+  useEffect(() => {
+    if (moviedb.popularTVs.error) {
+      setIsError(true);
+    }
+  }, [dispatch, moviedb.popularTVs.error]);
 
   return (
     <>
@@ -51,19 +66,22 @@ const TvShow = () => {
                       <p className="has-text-centered">
                         {item.name} ({item.first_air_date})
                       </p>
-                      <p
-                        v-if="data.vote_average != 0"
-                        className="has-text-centered"
-                      >
-                        {item.vote_average}
-                      </p>
+                      <p className="has-text-centered">{item.vote_average}</p>
                     </div>
                   </div>
                 )
               )}
           </div>
           {moviedb.popularTVs.isLoading && <p>Loading ...</p>}
-          <Button onClick={onLoadMore}>See More</Button>
+          {!moviedb.popularTVs.isLoading && (
+            <>
+              {isError ? (
+                <Button onClick={onReload}>Reload</Button>
+              ) : (
+                <Button onClick={onLoadMore}>See More</Button>
+              )}
+            </>
+          )}
         </div>
       </section>
     </>

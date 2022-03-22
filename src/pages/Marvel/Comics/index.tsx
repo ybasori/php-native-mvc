@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import Button from "../../../components/Button";
-import { getMarvelComics } from "../../../redux/marvel";
+import { getMarvelComics, getMarvelReset } from "../../../redux/marvel";
 import { Reducers } from "../../../redux/types";
 
 const Comics = () => {
@@ -9,6 +9,7 @@ const Comics = () => {
     limit: 20,
     offset: 0,
   });
+  const [isError, setIsError] = useState(false);
   const { marvel } = useSelector((state: Reducers) => state);
   const dispatch = useDispatch();
 
@@ -16,9 +17,23 @@ const Comics = () => {
     setPage((prev) => ({ ...prev, offset: prev.offset + prev.limit }));
   };
 
+  const onReload = () => {
+    setIsError(false);
+  };
+
   useEffect(() => {
-    dispatch(getMarvelComics({ ...page }));
-  }, [dispatch, page]);
+    if (!isError) {
+      dispatch(getMarvelComics({ ...page }));
+    } else {
+      dispatch(getMarvelReset("comics"));
+    }
+  }, [dispatch, isError, page]);
+
+  useEffect(() => {
+    if (marvel.comics.error) {
+      setIsError(true);
+    }
+  }, [dispatch, marvel.comics.error]);
 
   return (
     <>
@@ -40,7 +55,6 @@ const Comics = () => {
                 <div className="box is-justify-content-center is-flex-direction-column is-flex">
                   {item.thumbnail && (
                     <img
-                      v-if="data.thumbnail"
                       src={`${item.thumbnail.path}/portrait_xlarge.${item.thumbnail.extension}`}
                     />
                   )}
@@ -53,7 +67,15 @@ const Comics = () => {
           )}
       </div>
       {marvel.comics.isLoading && <p>Loading ...</p>}
-      <Button onClick={onLoadMore}>See More</Button>
+      {!marvel.comics.isLoading && (
+        <>
+          {isError ? (
+            <Button onClick={onReload}>Reload</Button>
+          ) : (
+            <Button onClick={onLoadMore}>See More</Button>
+          )}
+        </>
+      )}
     </>
   );
 };

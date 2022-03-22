@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from "react-router-dom";
 import Button from "../../components/Button";
-import { getAllPokemon } from "../../redux/pokemon";
+import { getAllPokemon, getPokemonAllReset } from "../../redux/pokemon";
 import { Reducers } from "../../redux/types";
 import PokemonItem from "./PokemonItem";
 
@@ -11,6 +11,7 @@ const Pokemon = () => {
     limit: 20,
     offset: 0,
   });
+  const [isError, setIsError] = useState(false);
   const { pokemon } = useSelector((state: Reducers) => state);
   const dispatch = useDispatch();
 
@@ -18,9 +19,23 @@ const Pokemon = () => {
     setPage((prev) => ({ ...prev, offset: prev.offset + prev.limit }));
   };
 
+  const onReload = () => {
+    setIsError(false);
+  };
+
   useEffect(() => {
-    dispatch(getAllPokemon({ ...page }));
-  }, [dispatch, page]);
+    if (!isError) {
+      dispatch(getAllPokemon({ ...page }));
+    } else {
+      dispatch(getPokemonAllReset());
+    }
+  }, [dispatch, isError, page]);
+
+  useEffect(() => {
+    if (pokemon.allPokemon.error) {
+      setIsError(true);
+    }
+  }, [dispatch, pokemon.allPokemon.error]);
   return (
     <>
       <section className="section">
@@ -46,7 +61,15 @@ const Pokemon = () => {
               )}
           </div>
           {pokemon.allPokemon.isLoading && <p>Loading ...</p>}
-          <Button onClick={onLoadMore}>See More</Button>
+          {!pokemon.allPokemon.isLoading && (
+            <>
+              {isError ? (
+                <Button onClick={onReload}>Reload</Button>
+              ) : (
+                <Button onClick={onLoadMore}>See More</Button>
+              )}
+            </>
+          )}
         </div>
       </section>
     </>

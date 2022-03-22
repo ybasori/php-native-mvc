@@ -117,7 +117,7 @@ export const postSpotifyLogin =
       dispatch({ type: POST_SPOTIFY_LOGIN_LOADING });
       const result = await api.postSpotifyLogin({ code });
       const res = await result.json();
-      if (result.status == 200) {
+      if (result.status < 400) {
         const expiresAt = new Date().getTime() + res.data.expires_in * 1000;
         dispatch({
           type: POST_SPOTIFY_LOGIN_SUCCESS,
@@ -146,7 +146,7 @@ export const postSpotifyRefresh =
         refresh_token: spotify.auth.data.refresh_token,
       });
       const res = await result.json();
-      if (result.status == 200) {
+      if (result.status < 400) {
         const expiresAt = new Date().getTime() + res.data.expires_in * 1000;
         dispatch({
           type: POST_SPOTIFY_LOGIN_SUCCESS,
@@ -188,7 +188,7 @@ export const getSpotifySearch =
         },
       });
       const res = await result.json();
-      if (result.status == 200) {
+      if (result.status < 400) {
         if (time > spotify.search.time) {
           dispatch({
             type: GET_SPOTIFY_SEARCH_SUCCESS,

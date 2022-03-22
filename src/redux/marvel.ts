@@ -4,26 +4,32 @@ import { Action, Dispatch, MarvelState, Reducers } from "./types";
 const GET_MARVEL_CHARACTERS_LOADING = "GET_MARVEL_CHARACTERS_LOADING";
 const GET_MARVEL_CHARACTERS_SUCCESS = "GET_MARVEL_CHARACTERS_SUCCESS";
 const GET_MARVEL_CHARACTERS_ERROR = "GET_MARVEL_CHARACTERS_ERROR";
+const GET_MARVEL_CHARACTERS_RESET = "GET_MARVEL_CHARACTERS_RESET";
 
 const GET_MARVEL_COMICS_LOADING = "GET_MARVEL_COMICS_LOADING";
 const GET_MARVEL_COMICS_SUCCESS = "GET_MARVEL_COMICS_SUCCESS";
 const GET_MARVEL_COMICS_ERROR = "GET_MARVEL_COMICS_ERROR";
+const GET_MARVEL_COMICS_RESET = "GET_MARVEL_COMICS_RESET";
 
 const GET_MARVEL_CREATORS_LOADING = "GET_MARVEL_CREATORS_LOADING";
 const GET_MARVEL_CREATORS_SUCCESS = "GET_MARVEL_CREATORS_SUCCESS";
 const GET_MARVEL_CREATORS_ERROR = "GET_MARVEL_CREATORS_ERROR";
+const GET_MARVEL_CREATORS_RESET = "GET_MARVEL_CREATORS_RESET";
 
 const GET_MARVEL_EVENTS_LOADING = "GET_MARVEL_EVENTS_LOADING";
 const GET_MARVEL_EVENTS_SUCCESS = "GET_MARVEL_EVENTS_SUCCESS";
 const GET_MARVEL_EVENTS_ERROR = "GET_MARVEL_EVENTS_ERROR";
+const GET_MARVEL_EVENTS_RESET = "GET_MARVEL_EVENTS_RESET";
 
 const GET_MARVEL_SERIES_LOADING = "GET_MARVEL_SERIES_LOADING";
 const GET_MARVEL_SERIES_SUCCESS = "GET_MARVEL_SERIES_SUCCESS";
 const GET_MARVEL_SERIES_ERROR = "GET_MARVEL_SERIES_ERROR";
+const GET_MARVEL_SERIES_RESET = "GET_MARVEL_SERIES_RESET";
 
 const GET_MARVEL_STORIES_LOADING = "GET_MARVEL_STORIES_LOADING";
 const GET_MARVEL_STORIES_SUCCESS = "GET_MARVEL_STORIES_SUCCESS";
 const GET_MARVEL_STORIES_ERROR = "GET_MARVEL_STORIES_ERROR";
+const GET_MARVEL_STORIES_RESET = "GET_MARVEL_STORIES_RESET";
 
 const initState: MarvelState = {
   character: {
@@ -88,6 +94,17 @@ const marvel = (state = initState, action: Action) => {
           error: action.payload,
         },
       };
+
+    case GET_MARVEL_CHARACTERS_RESET:
+      return {
+        ...state,
+        character: {
+          ...state.character,
+          isLoading: false,
+          error: null,
+        },
+      };
+
     case GET_MARVEL_COMICS_LOADING:
       return {
         ...state,
@@ -116,6 +133,17 @@ const marvel = (state = initState, action: Action) => {
           error: action.payload,
         },
       };
+
+    case GET_MARVEL_COMICS_RESET:
+      return {
+        ...state,
+        comics: {
+          ...state.comics,
+          isLoading: false,
+          error: null,
+        },
+      };
+
     case GET_MARVEL_CREATORS_LOADING:
       return {
         ...state,
@@ -144,6 +172,17 @@ const marvel = (state = initState, action: Action) => {
           error: action.payload,
         },
       };
+
+    case GET_MARVEL_CREATORS_RESET:
+      return {
+        ...state,
+        creators: {
+          ...state.creators,
+          isLoading: false,
+          error: null,
+        },
+      };
+
     case GET_MARVEL_EVENTS_LOADING:
       return {
         ...state,
@@ -172,6 +211,17 @@ const marvel = (state = initState, action: Action) => {
           error: action.payload,
         },
       };
+
+    case GET_MARVEL_EVENTS_RESET:
+      return {
+        ...state,
+        events: {
+          ...state.events,
+          isLoading: false,
+          error: null,
+        },
+      };
+
     case GET_MARVEL_SERIES_LOADING:
       return {
         ...state,
@@ -200,6 +250,17 @@ const marvel = (state = initState, action: Action) => {
           error: action.payload,
         },
       };
+
+    case GET_MARVEL_SERIES_RESET:
+      return {
+        ...state,
+        series: {
+          ...state.series,
+          isLoading: false,
+          error: null,
+        },
+      };
+
     case GET_MARVEL_STORIES_LOADING:
       return {
         ...state,
@@ -228,6 +289,17 @@ const marvel = (state = initState, action: Action) => {
           error: action.payload,
         },
       };
+
+    case GET_MARVEL_STORIES_RESET:
+      return {
+        ...state,
+        stories: {
+          ...state.stories,
+          isLoading: false,
+          error: null,
+        },
+      };
+
     default:
       return { ...state };
   }
@@ -244,12 +316,19 @@ export const getMarvelCharacter =
       const result = await api.getMarvelCharacter({ limit, offset });
       const res = await result.json();
 
-      const dt = marvel.character.data || [];
+      if (result.status < 400) {
+        const dt = marvel.character.data || [];
 
-      dispatch({
-        type: GET_MARVEL_CHARACTERS_SUCCESS,
-        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
-      });
+        dispatch({
+          type: GET_MARVEL_CHARACTERS_SUCCESS,
+          payload: [...(offset == 0 ? [] : dt), ...res.data.results],
+        });
+      } else {
+        dispatch({
+          type: GET_MARVEL_CHARACTERS_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_MARVEL_CHARACTERS_ERROR,
@@ -267,12 +346,19 @@ export const getMarvelComics =
       const result = await api.getMarvelComics({ limit, offset });
       const res = await result.json();
 
-      const dt = marvel.comics.data || [];
+      if (result.status < 400) {
+        const dt = marvel.comics.data || [];
 
-      dispatch({
-        type: GET_MARVEL_COMICS_SUCCESS,
-        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
-      });
+        dispatch({
+          type: GET_MARVEL_COMICS_SUCCESS,
+          payload: [...(offset == 0 ? [] : dt), ...res.data.results],
+        });
+      } else {
+        dispatch({
+          type: GET_MARVEL_COMICS_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_MARVEL_COMICS_ERROR,
@@ -290,12 +376,19 @@ export const getMarvelCreators =
       const result = await api.getMarvelCreators({ limit, offset });
       const res = await result.json();
 
-      const dt = marvel.creators.data || [];
+      if (result.status < 400) {
+        const dt = marvel.creators.data || [];
 
-      dispatch({
-        type: GET_MARVEL_CREATORS_SUCCESS,
-        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
-      });
+        dispatch({
+          type: GET_MARVEL_CREATORS_SUCCESS,
+          payload: [...(offset == 0 ? [] : dt), ...res.data.results],
+        });
+      } else {
+        dispatch({
+          type: GET_MARVEL_CREATORS_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_MARVEL_CREATORS_ERROR,
@@ -313,12 +406,19 @@ export const getMarvelEvents =
       const result = await api.getMarvelEvents({ limit, offset });
       const res = await result.json();
 
-      const dt = marvel.events.data || [];
+      if (result.status < 400) {
+        const dt = marvel.events.data || [];
 
-      dispatch({
-        type: GET_MARVEL_EVENTS_SUCCESS,
-        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
-      });
+        dispatch({
+          type: GET_MARVEL_EVENTS_SUCCESS,
+          payload: [...(offset == 0 ? [] : dt), ...res.data.results],
+        });
+      } else {
+        dispatch({
+          type: GET_MARVEL_EVENTS_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_MARVEL_EVENTS_ERROR,
@@ -336,12 +436,19 @@ export const getMarvelSeries =
       const result = await api.getMarvelSeries({ limit, offset });
       const res = await result.json();
 
-      const dt = marvel.series.data || [];
+      if (result.status < 400) {
+        const dt = marvel.series.data || [];
 
-      dispatch({
-        type: GET_MARVEL_SERIES_SUCCESS,
-        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
-      });
+        dispatch({
+          type: GET_MARVEL_SERIES_SUCCESS,
+          payload: [...(offset == 0 ? [] : dt), ...res.data.results],
+        });
+      } else {
+        dispatch({
+          type: GET_MARVEL_SERIES_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_MARVEL_SERIES_ERROR,
@@ -359,16 +466,54 @@ export const getMarvelStories =
       const result = await api.getMarvelStories({ limit, offset });
       const res = await result.json();
 
-      const dt = marvel.stories.data || [];
+      if (result.status < 400) {
+        const dt = marvel.stories.data || [];
 
-      dispatch({
-        type: GET_MARVEL_STORIES_SUCCESS,
-        payload: [...(offset == 0 ? [] : dt), ...res.data.results],
-      });
+        dispatch({
+          type: GET_MARVEL_STORIES_SUCCESS,
+          payload: [...(offset == 0 ? [] : dt), ...res.data.results],
+        });
+      } else {
+        dispatch({
+          type: GET_MARVEL_STORIES_ERROR,
+          payload: res.error,
+        });
+      }
     } catch (err) {
       dispatch({
         type: GET_MARVEL_STORIES_ERROR,
         payload: err,
       });
     }
+  };
+
+export const getMarvelReset =
+  (
+    value: "character" | "comics" | "creators" | "events" | "series" | "stories"
+  ) =>
+  async (dispatch: Dispatch) => {
+    let type = "";
+    switch (value) {
+      case "character":
+        type = GET_MARVEL_CHARACTERS_RESET;
+        break;
+      case "comics":
+        type = GET_MARVEL_COMICS_RESET;
+        break;
+      case "creators":
+        type = GET_MARVEL_CREATORS_RESET;
+        break;
+      case "events":
+        type = GET_MARVEL_EVENTS_RESET;
+        break;
+      case "series":
+        type = GET_MARVEL_SERIES_RESET;
+        break;
+
+      default:
+        type = GET_MARVEL_STORIES_RESET;
+        break;
+    }
+
+    dispatch({ type });
   };
