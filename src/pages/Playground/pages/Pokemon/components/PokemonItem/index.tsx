@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
-import { getPokemon } from "../../../redux/pokemon";
+import { getPokemon } from "../../../../../../redux/pokemon";
 
 interface Props {
   data: {

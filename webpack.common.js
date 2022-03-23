@@ -2,6 +2,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require("path");
 const webpack = require("webpack");
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 require("dotenv").config();
 
@@ -32,7 +33,7 @@ module.exports = {
       },
       {
         test: /\.(scss|sass|css)$/i,
-        use: ["style-loader", "css-loader", "sass-loader"],
+        use: [MiniCssExtractPlugin.loader, "css-loader", "sass-loader"],
       },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
@@ -56,6 +57,9 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       "process.env": JSON.stringify(process.env),
+    }),
+    new MiniCssExtractPlugin({
+      filename: "css/styles.css",
     }),
   ],
 };

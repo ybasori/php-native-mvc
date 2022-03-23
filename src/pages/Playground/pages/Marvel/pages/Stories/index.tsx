@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Button from "../../../components/Button";
-import { getMarvelEvents, getMarvelReset } from "../../../redux/marvel";
-import { Reducers } from "../../../redux/types";
+import Button from "../../../../../../components/Button";
+import {
+  getMarvelReset,
+  getMarvelStories,
+} from "../../../../../../redux/marvel";
+import { Reducers } from "../../../../../../redux/types";
 
-const Events = () => {
+const Stories = () => {
   const [page, setPage] = useState({
     limit: 20,
     offset: 0,
@@ -23,24 +26,24 @@ const Events = () => {
 
   useEffect(() => {
     if (!isError) {
-      dispatch(getMarvelEvents({ ...page }));
+      dispatch(getMarvelStories({ ...page }));
     } else {
-      dispatch(getMarvelReset("events"));
+      dispatch(getMarvelReset("stories"));
     }
   }, [dispatch, isError, page]);
 
   useEffect(() => {
-    if (marvel.events.error) {
+    if (marvel.stories.error) {
       setIsError(true);
     }
-  }, [dispatch, marvel.events.error]);
+  }, [dispatch, marvel.stories.error]);
 
   return (
     <>
-      <h2 className="subtitle">Events</h2>
+      <h2 className="subtitle">Stories</h2>
       <div className="columns is-multiline is-desktop">
-        {marvel.events.data &&
-          marvel.events.data.map(
+        {marvel.stories.data &&
+          marvel.stories.data.map(
             (
               item: {
                 thumbnail: { path: string; extension: string };
@@ -50,7 +53,7 @@ const Events = () => {
             ) => (
               <div
                 className="column is-one-fifth"
-                key={`marvel-events-${index + 1}`}
+                key={`marvel-stories-${index + 1}`}
               >
                 <div className="box is-justify-content-center is-flex-direction-column is-flex">
                   {item.thumbnail && (
@@ -66,8 +69,8 @@ const Events = () => {
             )
           )}
       </div>
-      {marvel.events.isLoading && <p>Loading ...</p>}
-      {!marvel.events.isLoading && (
+      {marvel.stories.isLoading && <p>Loading ...</p>}
+      {!marvel.stories.isLoading && (
         <>
           {isError ? (
             <Button onClick={onReload}>Reload</Button>
@@ -80,4 +83,4 @@ const Events = () => {
   );
 };
 
-export default Events;
+export default Stories;

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Button from "../../../components/Button";
-import { getMarvelCreators, getMarvelReset } from "../../../redux/marvel";
-import { Reducers } from "../../../redux/types";
+import Button from "../../../../../../components/Button";
+import {
+  getMarvelCreators,
+  getMarvelReset,
+} from "../../../../../../redux/marvel";
+import { Reducers } from "../../../../../../redux/types";
 
 const Creators = () => {
   const [page, setPage] = useState({

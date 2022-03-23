@@ -1,9 +1,9 @@
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useSearchParams } from "react-router-dom";
-import { Reducers } from "../../../../redux/types";
-import { getSpotifySearch } from "../../../../redux/spotify";
-import { useSpotify } from "../../../../components/SpotifyPlayer";
+import { Reducers } from "../../../../../../redux/types";
+import { getSpotifySearch } from "../../../../../../redux/spotify";
+import { useSpotify } from "../../../../../../components/SpotifyPlayer";
 
 interface TrackProps {
   artists: { name: string }[];

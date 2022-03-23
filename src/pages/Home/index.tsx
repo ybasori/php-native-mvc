@@ -32,27 +32,7 @@ const Home = () => {
         <div className="columns is-multiline is-desktop">
           <div className="column">
             <div className="box is-justify-content-center is-flex-direction-column is-flex">
-              <Link to="/movies">Movies</Link>
-            </div>
-          </div>
-          <div className="column">
-            <div className="box is-justify-content-center is-flex-direction-column is-flex">
-              <Link to="/tv-shows">TV Shows</Link>
-            </div>
-          </div>
-          <div className="column">
-            <div className="box is-justify-content-center is-flex-direction-column is-flex">
-              <Link to="/pokemon">Pokemon</Link>
-            </div>
-          </div>
-          <div className="column">
-            <div className="box is-justify-content-center is-flex-direction-column is-flex">
-              <Link to="/marvel">Marvel</Link>
-            </div>
-          </div>
-          <div className="column">
-            <div className="box is-justify-content-center is-flex-direction-column is-flex">
-              <Link to="/spotify">Spotify</Link>
+              <Link to="/playground">Playground</Link>
             </div>
           </div>
         </div>

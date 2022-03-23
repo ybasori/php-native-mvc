@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import Button from "../../../components/Button";
-import { getMarvelComics, getMarvelReset } from "../../../redux/marvel";
-import { Reducers } from "../../../redux/types";
+import Button from "../../../../../../components/Button";
+import {
+  getMarvelCharacter,
+  getMarvelReset,
+} from "../../../../../../redux/marvel";
+import { Reducers } from "../../../../../../redux/types";
 
-const Comics = () => {
+const Character = () => {
   const [page, setPage] = useState({
     limit: 20,
     offset: 0,
@@ -23,34 +26,34 @@ const Comics = () => {
 
   useEffect(() => {
     if (!isError) {
-      dispatch(getMarvelComics({ ...page }));
+      dispatch(getMarvelCharacter({ ...page }));
     } else {
-      dispatch(getMarvelReset("comics"));
+      dispatch(getMarvelReset("character"));
     }
   }, [dispatch, isError, page]);
 
   useEffect(() => {
-    if (marvel.comics.error) {
+    if (marvel.character.error) {
       setIsError(true);
     }
-  }, [dispatch, marvel.comics.error]);
+  }, [dispatch, marvel.character.error]);
 
   return (
     <>
-      <h2 className="subtitle">Comics</h2>
+      <h2 className="subtitle">Characters</h2>
       <div className="columns is-multiline is-desktop">
-        {marvel.comics.data &&
-          marvel.comics.data.map(
+        {marvel.character.data &&
+          marvel.character.data.map(
             (
               item: {
                 thumbnail: { path: string; extension: string };
-                title: string;
+                name: string;
               },
               index: number
             ) => (
               <div
                 className="column is-one-fifth"
-                key={`marvel-comics-${index + 1}`}
+                key={`marvel-character-${index + 1}`}
               >
                 <div className="box is-justify-content-center is-flex-direction-column is-flex">
                   {item.thumbnail && (
@@ -59,15 +62,15 @@ const Comics = () => {
                     />
                   )}
                   <div className="is-capitalized has-text-centered">
-                    {item.title}
+                    {item.name}
                   </div>
                 </div>
               </div>
             )
           )}
       </div>
-      {marvel.comics.isLoading && <p>Loading ...</p>}
-      {!marvel.comics.isLoading && (
+      {marvel.character.isLoading && <p>Loading ...</p>}
+      {!marvel.character.isLoading && (
         <>
           {isError ? (
             <Button onClick={onReload}>Reload</Button>
@@ -80,4 +83,4 @@ const Comics = () => {
   );
 };
 
-export default Comics;
+export default Character;

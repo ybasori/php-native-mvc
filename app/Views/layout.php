@@ -22,6 +22,7 @@
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
 
+    <link rel="stylesheet" href="/assets/css/styles.css?<?= date("s"); ?>">
     <script defer src="/assets/js/app.bundle.js?<?= date("s"); ?>"></script>
     <script defer src="/assets/js/runtime.bundle.js?<?= date("s"); ?>"></script>
     <script defer src="/assets/js/shared.bundle.js?<?= date("s"); ?>"></script>
