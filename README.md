@@ -1,3 +1,5 @@
+Framework that doesn't take much of a storage
+
 for development
 
 run server:
@@ -15,7 +17,11 @@ npm run dev
 for production
 
 server:
+
 make directory public as main root url
 
 client:
+
+```
 npm run build
+```
