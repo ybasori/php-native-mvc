@@ -2,7 +2,12 @@
 
 use System\Router;
 
-use App\Controllers\ReactJSController;
+
+use App\Middlewares\ExampleFailMiddleware;
+use App\Middlewares\ExampleSuccessMiddleware;
+
+use App\Controllers\HomeController;
+use App\Controllers\ExampleController;
 use App\Controllers\Api\V1\MarvelController;
 use App\Controllers\Api\V1\MovieDBController;
 use App\Controllers\Api\V1\PokemonController;
@@ -10,7 +15,10 @@ use App\Controllers\Api\V1\SpotifyController;
 
 $router = new Router();
 
-$router->any([ReactJSController::class, 'index']);
+$router->any([HomeController::class, 'index']);
+
+$router->get("/example", [ExampleSuccessMiddleware::class], [ExampleController::class, 'example']);
+$router->get("/example-fail", [ExampleFailMiddleware::class], [ExampleController::class, 'example']);
 
 $router->get("/api/v1/marvel/characters", [MarvelController::class, 'characters']);
 $router->get("/api/v1/marvel/comics", [MarvelController::class, 'comics']);

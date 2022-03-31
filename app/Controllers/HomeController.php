@@ -2,12 +2,12 @@
 
 namespace App\Controllers;
 
-class ReactJSController extends Controller
+class HomeController extends Controller
 {
 
     public function index()
     {
-        return $this->view("reactjs-layout", [
+        return $this->view("layout", [
             "title" => "Yusuf App",
             "meta" => [
                 (object) [
