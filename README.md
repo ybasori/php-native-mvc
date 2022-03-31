@@ -1,3 +1,21 @@
 for development
 
-run php -S 0.0.0.0:8000 -t public
+run server:
+
+```
+php -S 0.0.0.0:8000 -t public
+```
+
+run client:
+
+```
+npm run dev
+```
+
+for production
+
+server:
+make directory public as main root url
+
+client:
+npm run build
