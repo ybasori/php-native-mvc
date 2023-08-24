@@ -8,6 +8,7 @@ class Router
     private $notFoundHandler;
     private const METHOD_POST = 'POST';
     private const METHOD_GET = 'GET';
+    private const METHOD_DELETE = 'DELETE';
     private $middlewareIndex = 0;
     private $middlewareNextIndex = false;
 
@@ -46,6 +47,18 @@ class Router
             $middlewares = [];
         }
         $this->addHandler(self::METHOD_POST, $path, $middlewares, $handler);
+    }
+    public function delete(string $path, $firstHandler, $secondHandler = null): void
+    {
+
+        $middlewares = $firstHandler;
+        $handler = $secondHandler;
+
+        if (empty($secondHandler)) {
+            $handler = $firstHandler;
+            $middlewares = [];
+        }
+        $this->addHandler(self::METHOD_DELETE, $path, $middlewares, $handler);
     }
 
     public function any($handler): void

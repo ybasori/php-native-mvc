@@ -1,5 +1,4 @@
 .env
 vendor
 node_modules
-public/assets
 package-lock.json

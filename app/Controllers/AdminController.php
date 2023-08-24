@@ -2,45 +2,13 @@
 
 namespace App\Controllers;
 
-use App\Models\DataTypeItem;
+use App\Models\FieldForm;
 use App\Models\Path;
 
-class HomeController extends Controller
+class AdminController extends Controller
 {
-
-    public function index()
+    private function getSelectedPath()
     {
-        return $this->view("layout", [
-            "title" => "Yusuf App",
-            "meta" => [
-                (object) [
-                    "name" => "description",
-                    "content" => "Yusuf App"
-                ],
-                (object) [
-                    "name" => "keyword",
-                    "content" => "HTML, CSS, Javascript, PHP"
-                ],
-                (object) [
-                    "name" => "author",
-                    "content" => "Yusuf Basori"
-                ],
-            ]
-        ]);
-    }
-
-    public function docs()
-    {
-        $path = new Path;
-        $data_path = $path->getAll([]);
-        $this->view("layouts/base-layout/header");
-        $this->view("pages/docs/index", ["data_path" => $data_path]);
-        $this->view("layouts/base-layout/footer");
-    }
-
-    public function docs_any()
-    {
-
         $requestUri = parse_url($_SERVER['REQUEST_URI']);
         $requestPath = $requestUri['path'];
         $path = new Path;
@@ -117,21 +85,106 @@ class HomeController extends Controller
                         }
                     }
                 }
-
-
-                // if (!$skip && $method === $handler['method']) {
-                //     if (count($arrayReqPath) != 0 && count($arrayPath) != 0) {
-                //         $matched = true;
-                //     }
-                // }
             }
-
-
 
             if ($matched) {
                 $selectedPath = $dt->full_path;
                 $params = $newParams;
             }
         }
+
+        return [
+            "path" => $selectedPath,
+            "params" => $params
+        ];
+    }
+
+    public function index()
+    {
+
+        $requestUri = parse_url($_SERVER['REQUEST_URI']);
+        $path = array_filter(explode("/", $requestUri['path']));
+        unset($path[1]);
+        $fullpath = "/" . implode("/", $path);
+
+        if ($fullpath == "/") {
+            $path = new Path;
+            $data = $path->getAll([]);
+
+            $this->view("layouts/base-layout/header");
+            $this->view("pages/admin/index", ["data" => $data]);
+            $this->view("layouts/base-layout/footer");
+        }
+    }
+
+    public function show()
+    {
+
+        $requestUri = parse_url($_SERVER['REQUEST_URI']);
+        $path = array_filter(explode("/", $requestUri['path']));
+        unset($path[1]);
+        $fullpath = "/" . implode("/", $path);
+
+        $this->view("layouts/base-layout/header");
+        $path = new Path;
+        if ($fullpath == "/") {
+            $data = $path->getAll([]);
+
+            $this->view("pages/admin/index", ["data" => $data]);
+        } else {
+            $cur = $this->getSelectedPath();
+            $data = $path->get([
+                "where" => [
+                    ["path", "=", $cur['path']]
+                ]
+            ]);
+        }
+        $this->view("layouts/base-layout/footer");
+    }
+
+    public function store()
+    {
+        $path = new Path;
+        $dataPath = $_POST;
+        unset($dataPath['field']);
+        $dataField = $_POST['field'];
+
+        $id = $path->insert($dataPath);
+
+        foreach ($dataField as $key => $value) {
+            $fieldForm = new FieldForm;
+            $fieldForm->insert(array_merge($value, [
+                "path_id" => $id
+            ]));
+        }
+
+        return $this->json(["id" => $id, "field" => $dataField]);
+    }
+
+    public function delete()
+    {
+        $path = new Path;
+
+
+        $data = $path->getAll([
+            "where" => [
+                ["parent_id", "=", $_GET['id']]
+            ]
+        ]);
+
+        foreach ($data as $dt) {
+            $path->delete([
+                "where" => [
+                    ["id", "=", $dt->id]
+                ]
+            ]);
+        }
+
+        $path->delete([
+            "where" => [
+                ["id", "=", $_GET['id']]
+            ]
+        ]);
+        return $this->json(["id" => $_GET['id']]);
     }
 }
