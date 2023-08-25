@@ -7,97 +7,7 @@ use App\Models\Path;
 
 class AdminController extends Controller
 {
-    private function getSelectedPath()
-    {
-        $requestUri = parse_url($_SERVER['REQUEST_URI']);
-        $requestPath = $requestUri['path'];
-        $path = new Path;
-        $data_path = $path->getAll([]);
 
-        $selectedPath = "";
-        $params = [];
-        $matched = false;
-        foreach ($data_path as $dt) {
-
-            if ($matched) {
-                continue;
-            }
-            $fullpath = $dt->full_path;
-
-            $fullpath = str_replace("\\", "\\\\", $fullpath);
-
-
-            $explodePath = explode("/", $fullpath);
-
-            $arrayPath = [];
-            foreach ($explodePath as $value) {
-                if ($value != "") {
-                    $arrayPath[] = $value;
-                }
-            }
-
-            $explodeReqPath = explode("/", $requestPath);
-
-
-            $arrayReqPath = [];
-            foreach ($explodeReqPath as $value) {
-                if ($value != "") {
-                    $arrayReqPath[] = $value;
-                }
-            }
-
-            $newParams = [];
-
-            if ($requestPath == "/" && $requestPath === $path) {
-                $matched = true;
-            } else {
-
-                $skip = false;
-                $any = false;
-
-                foreach ($arrayReqPath as $key => $value) {
-
-                    if ($skip) {
-                        continue;
-                    }
-
-                    if (!empty($arrayPath[$key]) || $any) {
-
-                        if (!$any && $arrayPath[$key] != $value) {
-
-                            if (substr($arrayPath[$key], 0, 1) == ":") {
-                                if ($arrayPath[$key] == ":any") {
-                                    $any = true;
-                                } else {
-                                    $newParams[substr($arrayPath[$key], 1, strlen($arrayPath[$key]))] = $value;
-                                }
-                            } else {
-                                $skip = true;
-                            }
-                        }
-                    } else {
-                        $skip = true;
-                    }
-
-                    if (count($arrayReqPath) - 1 == $key && !$any) {
-                        if (!empty($arrayPath[$key + 1]) && $arrayPath[$key + 1] != "") {
-                            $skip = true;
-                        }
-                    }
-                }
-            }
-
-            if ($matched) {
-                $selectedPath = $dt->full_path;
-                $params = $newParams;
-            }
-        }
-
-        return [
-            "path" => $selectedPath,
-            "params" => $params
-        ];
-    }
 
     public function index()
     {
@@ -132,12 +42,23 @@ class AdminController extends Controller
 
             $this->view("pages/admin/index", ["data" => $data]);
         } else {
-            $cur = $this->getSelectedPath();
+            $cur = $this->getSelectedPath("/admin");
             $data = $path->get([
                 "where" => [
-                    ["path", "=", $cur['path']]
+                    ["full_path", "=", $cur['path']]
                 ]
             ]);
+            if ($data) {
+                $this->view("pages/admin/show", [
+                    "path" => (object) array_merge((array) $data, [
+                        "actualpath" => $cur['actualpath'],
+                        "params" => (object) $cur['params'],
+                        "realpath" => substr(parse_url($_SERVER['REQUEST_URI'])['path'], 6)
+                    ])
+                ]);
+            } else {
+                echo "404";
+            }
         }
         $this->view("layouts/base-layout/footer");
     }
@@ -163,6 +84,16 @@ class AdminController extends Controller
 
     public function delete()
     {
+        $field = new FieldForm;
+
+        $data = $field->delete([
+            "where" => [
+                ["path_id", "=", $_GET['id']]
+            ]
+        ]);
+
+
+
         $path = new Path;
 
 

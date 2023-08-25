@@ -24,6 +24,7 @@ $router->post("/admin", [AdminController::class, 'store']);
 $router->delete("/admin", [AdminController::class, 'delete']);
 
 $router->get("/json", [JSONController::class, 'index']);
+$router->get("/json/:any", [JSONController::class, 'show']);
 
 $router->get("/docs/:any", [HomeController::class, 'docs_any']);
 

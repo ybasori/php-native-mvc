@@ -20,17 +20,18 @@ class Model
     {
 
         $where = "";
+        $whereArr = [];
 
         foreach ($data['where'] as $item) {
             if ($item[3] == true) {
-                $where .= " " . implode(" ", $item);
+                $whereArr[] = " " . implode(" ", $item);
             } else {
                 $item[2] = "'$item[2]'";
-                $where .= " " . implode(" ", $item);
+                $whereArr[] = " " . implode(" ", $item);
             }
         }
         if ($where != "") {
-            $where = "WHERE $where";
+            $where = "WHERE " . implode(" AND ", $whereArr);
         }
 
         $query = $this->db->query("SELECT * FROM $this->table $where");
@@ -47,19 +48,20 @@ class Model
             $limit = "LIMIT $offset,$data[pagination][limit]";
         }
 
+
         $where = "";
-        if (!empty($data['where'])) {
-            foreach ($data['where'] as $item) {
-                if (!empty($item[3]) && $item[3] == true) {
-                    $where .= " " . implode(" ", $item);
-                } else {
-                    $item[2] = "'$item[2]'";
-                    $where .= " " . implode(" ", $item);
-                }
+        $whereArr = [];
+
+        foreach ($data['where'] as $item) {
+            if ($item[3] == true) {
+                $whereArr[] = " " . implode(" ", $item);
+            } else {
+                $item[2] = "'$item[2]'";
+                $whereArr[] = " " . implode(" ", $item);
             }
-            if ($where != "") {
-                $where = "WHERE $where";
-            }
+        }
+        if ($where != "") {
+            $where = "WHERE " . implode(" AND ", $whereArr);
         }
 
         $query = $this->db->query("SELECT * FROM $this->table $where $limit");
@@ -70,18 +72,20 @@ class Model
 
     public function getTotal($data)
     {
+
         $where = "";
+        $whereArr = [];
 
         foreach ($data['where'] as $item) {
             if ($item[3] == true) {
-                $where .= " " . implode(" ", $item);
+                $whereArr[] = " " . implode(" ", $item);
             } else {
                 $item[2] = "'$item[2]'";
-                $where .= " " . implode(" ", $item);
+                $whereArr[] = " " . implode(" ", $item);
             }
         }
         if ($where != "") {
-            $where = "WHERE $where";
+            $where = "WHERE " . implode(" AND ", $whereArr);
         }
 
         $query = $this->db->query("SELECT COUNT(*) as total FROM $this->table $where");
@@ -122,19 +126,20 @@ class Model
     {
 
         try {
+
             $where = "";
-            if (!empty($data['where'])) {
-                foreach ($data['where'] as $item) {
-                    if ($item[3] == true) {
-                        $where .= " " . implode(" ", $item);
-                    } else {
-                        $item[2] = "'$item[2]'";
-                        $where .= " " . implode(" ", $item);
-                    }
+            $whereArr = [];
+
+            foreach ($data['where'] as $item) {
+                if ($item[3] == true) {
+                    $whereArr[] = " " . implode(" ", $item);
+                } else {
+                    $item[2] = "'$item[2]'";
+                    $whereArr[] = " " . implode(" ", $item);
                 }
-                if ($where != "") {
-                    $where = "WHERE $where";
-                }
+            }
+            if ($where != "") {
+                $where = "WHERE " . implode(" AND ", $whereArr);
             }
 
             $query = $this->db->query("DELETE FROM $this->table $where");
