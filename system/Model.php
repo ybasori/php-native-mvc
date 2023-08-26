@@ -30,9 +30,11 @@ class Model
                 $whereArr[] = " " . implode(" ", $item);
             }
         }
-        if ($where != "") {
+        if (count($whereArr) > 0) {
             $where = "WHERE " . implode(" AND ", $whereArr);
         }
+
+
 
         $query = $this->db->query("SELECT * FROM $this->table $where");
         $query->execute();
@@ -60,7 +62,7 @@ class Model
                 $whereArr[] = " " . implode(" ", $item);
             }
         }
-        if ($where != "") {
+        if (count($whereArr) > 0) {
             $where = "WHERE " . implode(" AND ", $whereArr);
         }
 
@@ -84,7 +86,7 @@ class Model
                 $whereArr[] = " " . implode(" ", $item);
             }
         }
-        if ($where != "") {
+        if (count($whereArr) > 0) {
             $where = "WHERE " . implode(" AND ", $whereArr);
         }
 
@@ -121,6 +123,37 @@ class Model
 
         return $this->db->lastInsertedId();
     }
+    public function update($data)
+    {
+
+        $set = array_merge($data['set'], [
+            "updated_at" => date("Y-m-d H:i:s")
+        ]);
+        $update = [];
+        foreach ($set as $key => $dt) {
+            $update[] = "$key = '$dt'";
+        }
+
+
+        $where = "";
+        $whereArr = [];
+
+        foreach ($data['where'] as $item) {
+            if ($item[3] == true) {
+                $whereArr[] = " " . implode(" ", $item);
+            } else {
+                $item[2] = "'$item[2]'";
+                $whereArr[] = " " . implode(" ", $item);
+            }
+        }
+        if (count($whereArr) > 0) {
+            $where = "WHERE " . implode(" AND ", $whereArr);
+        }
+
+
+        $query = $this->db->query("UPDATE $this->table SET " . implode(", ", $update) . " $where");
+        return $query->execute();
+    }
 
     public function delete($data)
     {
@@ -138,7 +171,7 @@ class Model
                     $whereArr[] = " " . implode(" ", $item);
                 }
             }
-            if ($where != "") {
+            if (count($whereArr) > 0) {
                 $where = "WHERE " . implode(" AND ", $whereArr);
             }
 

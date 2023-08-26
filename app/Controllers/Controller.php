@@ -109,7 +109,7 @@ class Controller extends Response
         }
 
         return [
-            "mathced" => $matched,
+            "matched" => $matched,
             "path" => $selectedPath,
             "actualpath" => $selectedActualPath,
             "params" => $params,

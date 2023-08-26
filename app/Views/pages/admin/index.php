@@ -1,7 +1,14 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
-            <button class="btn btn-default" type="button" onclick="onOpenAddModal()">Add New</button>
+
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="pull-right">
+                        <button class="btn btn-default" type="button" onclick="onOpenAddModal()">Add New</button>
+                    </div>
+                </div>
+            </div>
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -19,8 +26,11 @@
                                 <td><?= $dt->name ?></td>
                                 <td><?= $dt->full_path ?></td>
                                 <td>
+                                    <button class="btn btn-success" type="button" onclick="selectedEditId('<?= $dt->id ?>')">Edit</button>
                                     <button class="btn btn-danger" type="button" onclick="selectedId('<?= $dt->id ?>')">Delete</button>
-                                    <a class="btn btn-default" href="/admin<?= $dt->full_path ?>" role="button">Open</a>
+                                    <?php if ($dt->type == "form") : ?>
+                                        <a class="btn btn-default" href="/admin<?= $dt->full_path ?>" role="button">Open</a>
+                                    <?php endif; ?>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -46,13 +56,13 @@
                     <div class="form-group">
                         <label for="" class="col-sm-2 control-label">Name</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" placeholder="Name" name="name" onkeyup="onAlterPath(event)" onchange="onAlterPath(event)" required autocomplete="off">
+                            <input type="text" class="form-control" placeholder="Name" name="name" onkeyup="onAlterPath(event, 'addModal')" onchange="onAlterPath(event, 'addModal')" required autocomplete="off">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="" class="col-sm-2 control-label">Type</label>
                         <div class="col-sm-10">
-                            <select type="text" class="form-control" name="type" onchange="onChangeType(event)" required>
+                            <select type="text" class="form-control" name="type" onchange="onChangeType(event, 'addModal')" required>
                                 <option hidden>Type</option>
                                 <option value="path">Path</option>
                                 <option value="form">Form</option>
@@ -181,7 +191,7 @@
                                     <div class="panel panel-default">
                                         <div class="panel-heading" role="tab" id="headingOne" onclick="collapsePanel(event)">
                                             <h4 class="panel-title">
-                                                Keyword (default field)
+                                                Keywords (default field)
                                             </h4>
                                         </div>
                                         <div class="panel-collapse collapse">
@@ -189,13 +199,13 @@
                                                 <div class="form-group">
                                                     <label for="" class="col-sm-2 control-label">Field Label</label>
                                                     <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Label" value="Keyword" readonly>
+                                                        <input type="text" class="form-control" id="" placeholder="Field Label" value="Keywords" readonly>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
                                                     <label for="" class="col-sm-2 control-label">Field Name</label>
                                                     <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Name" value="keyword" readonly>
+                                                        <input type="text" class="form-control" id="" placeholder="Field Name" value="keywords" readonly>
                                                     </div>
                                                 </div>
                                                 <div class="form-group">
@@ -240,6 +250,37 @@
         </div>
     </div>
 </div>
+<!-- Modal -->
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel">Edit Path</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" onsubmit="onSubmitEdit(event)">
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">Name</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control" placeholder="Name" name="name" required autocomplete="off">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <button id="editSubmit" type="submit" class="btn btn-default" style="display: none;">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeModal('editModal')">Close</button>
+                <button type="button" class="btn btn-primary" onclick="document.getElementById('editSubmit').click()">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
@@ -264,13 +305,14 @@
     var allPath = [];
     var selected = null;
     var pathType = null;
+    var editId = null;
 
     function onAlterHeader(e) {
 
         e.target.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(".panel-title").innerHTML = e.target.value === "" ? "Field" : e.target.value
     }
 
-    function alteringPath(name) {
+    function alteringPath(name, id) {
         if (name !== "") {
 
             name = name.replace(/[^a-zA-Z0-9-_\s]/g, '');
@@ -292,12 +334,13 @@
 
             name = name.toLowerCase()
         }
-        document.querySelector("input[name=path]").setAttribute("value", name)
+
+        document.getElementById(id).querySelector("input[name=path]").setAttribute("value", name)
     }
 
-    function onAlterPath(e) {
+    function onAlterPath(e, id) {
         let name = e.target.value
-        alteringPath(name);
+        alteringPath(name, id);
     }
 
     function collapsePanel(e) {
@@ -367,20 +410,62 @@
         e.target.parentElement.parentElement.parentElement.parentElement.parentElement.remove();
     }
 
-    function onChangeType(e) {
+    function onChangeType(e, id) {
         pathType = e.target.value
         if (e.target.value === "form") {
-            document.getElementById("if-type-form").style.display = "block";
+            document.getElementById(id).querySelector("#if-type-form").style.display = "block";
         } else {
-            document.getElementById("if-type-form").style.display = "none"
+            document.getElementById(id).querySelector("#if-type-form").style.display = "none"
         }
 
-        alteringPath(document.querySelector("input[name=name]").value);
+        alteringPath(document.querySelector("input[name=name]").value, id);
     }
 
     function selectedId(value) {
         selected = value;
         openModal("deleteModal");
+    }
+
+    function arrToModalById(arr, id, value = null) {
+        var data = null;
+        allPath = arr;
+        arr.forEach(function(item) {
+            var opt = document.createElement("option");
+            opt.text = item.full_path
+            opt.value = item.full_path
+            if (value !== null && item.id === Number(value)) {
+                data = item;
+            }
+
+            if (id != "editModal") {
+                document.getElementById(id).querySelector("select[name='parent']").appendChild(opt)
+            }
+        })
+
+        if (data !== null && id === "editModal") {
+            var modalEl = document.getElementById(id)
+            modalEl.querySelector("input[name=name]").value = data.name;
+
+
+        }
+    }
+
+
+    function selectedEditId(value) {
+        editId = value;
+        openModal("editModal").then(() => {
+            if (allPath.length === 0) {
+                fetch("/json", {
+                    method: "get",
+                }).then(function(res) {
+                    return res.json()
+                }).then(function(res) {
+                    arrToModalById(res.data, "editModal", value)
+                })
+            } else {
+                arrToModalById(allPath, "editModal", value)
+            }
+        })
     }
 
     function onDelete() {
@@ -403,16 +488,24 @@
                 }).then(function(res) {
                     return res.json()
                 }).then(function(res) {
-                    allPath = res.data;
-                    res.data.forEach(function(item) {
-                        var opt = document.createElement("option");
-                        opt.text = item.full_path
-                        opt.value = item.full_path
-
-                        document.querySelector("select[name='parent']").appendChild(opt)
-                    })
+                    arrToModalById(res.data, "addModal")
                 })
+            } else {
+                arrToModalById(allPath, "addModal")
             }
+        })
+    }
+
+    function onSubmitEdit(e) {
+        e.preventDefault();
+
+        var form = new URLSearchParams(new FormData(e.target));
+
+        fetch(`/admin?id=${editId}`, {
+            method: "put",
+            body: form
+        }).then(function(res) {
+            window.location.reload();
         })
     }
 
@@ -446,37 +539,45 @@
 
         if (e.target[name = 'type'].value === 'form') {
             form.append('resources_json', JSON.stringify(["index", "show", "store", "update", "delete"]));
-            const fieldLabel = e.target[name = 'field[][label]'];
-            if (!Array.isArray(fieldLabel)) {
-                form.append("field[0][label]", fieldLabel.value)
-            } else {
-                fieldLabel.forEach((item, index) => {
-                    form.append("field[" + index + "][label]", item.value)
-                })
+            if (e.target[name = 'field[][label]']) {
+                const fieldLabel = e.target[name = 'field[][label]'];
+                if (fieldLabel.length === undefined) {
+                    form.append("field[0][label]", fieldLabel.value)
+                } else {
+                    fieldLabel.forEach((item, index) => {
+                        form.append("field[" + index + "][label]", item.value)
+                    })
+                }
             }
-            const fieldName = e.target[name = 'field[][name]'];
-            if (!Array.isArray(fieldName)) {
-                form.append("field[0][name]", fieldName.value)
-            } else {
-                fieldName.forEach((item, index) => {
-                    form.append("field[" + index + "][name]", item.value)
-                })
+            if (e.target[name = 'field[][name]']) {
+                const fieldName = e.target[name = 'field[][name]'];
+                if (fieldName.length === undefined) {
+                    form.append("field[0][name]", fieldName.value)
+                } else {
+                    fieldName.forEach((item, index) => {
+                        form.append("field[" + index + "][name]", item.value)
+                    })
+                }
             }
-            const fieldType = e.target[name = 'field[][type]'];
-            if (!Array.isArray(fieldType)) {
-                form.append("field[0][type]", fieldType.value)
-            } else {
-                fieldType.forEach((item, index) => {
-                    form.append("field[" + index + "][type]", item.value)
-                })
+            if (e.target[name = 'field[][type]']) {
+                const fieldType = e.target[name = 'field[][type]'];
+                if (fieldType.length === undefined) {
+                    form.append("field[0][type]", fieldType.value)
+                } else {
+                    fieldType.forEach((item, index) => {
+                        form.append("field[" + index + "][type]", item.value)
+                    })
+                }
             }
-            const defaultValue = e.target[name = 'field[][default_value]'];
-            if (!Array.isArray(defaultValue)) {
-                form.append("field[0][default_value]", defaultValue.value)
-            } else {
-                defaultValue.forEach((item, index) => {
-                    form.append("field[" + index + "][default_value]", item.value)
-                })
+            if (e.target[name = 'field[][default_value]']) {
+                const defaultValue = e.target[name = 'field[][default_value]'];
+                if (defaultValue.length === undefined) {
+                    form.append("field[0][default_value]", defaultValue.value)
+                } else {
+                    defaultValue.forEach((item, index) => {
+                        form.append("field[" + index + "][default_value]", item.value)
+                    })
+                }
             }
         } else {
             form.append('resources_json', JSON.stringify(["index"]));
