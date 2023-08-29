@@ -3,7 +3,12 @@
 namespace App\Controllers;
 
 use App\Models\Path;
+use Exception;
 use System\Response;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
+use Firebase\JWT\ExpiredException;
+use UnexpectedValueException;
 
 class Controller extends Response
 {
@@ -11,7 +16,19 @@ class Controller extends Response
     private function matchingPath($requestPath, $prefix,  $fullpath, $affix)
     {
         $explodedFullpath = explode("/", $prefix . $fullpath . $affix);
+        if ($explodedFullpath[0] === "") {
+            unset($explodedFullpath[0]);
+        }
+        if ($explodedFullpath[count($explodedFullpath) - 1] === "") {
+            unset($explodedFullpath[count($explodedFullpath) - 1]);
+        }
         $explodedReqPath = explode("/", $requestPath);
+        if ($explodedReqPath[0] === "") {
+            unset($explodedReqPath[0]);
+        }
+        if ($explodedReqPath[count($explodedReqPath) - 1] === "") {
+            unset($explodedReqPath[count($explodedReqPath) - 1]);
+        }
         if (count($explodedFullpath) == count($explodedReqPath)) {
             $correct = 0;
             $newParams = [];
@@ -115,5 +132,17 @@ class Controller extends Response
             "params" => $params,
             "path_id" => $path_id
         ];
+    }
+
+    public function getUser()
+    {
+        try {
+            $code = JWT::decode(str_replace("Bearer ", "", $_SERVER["HTTP_AUTHORIZATION"]), new Key($_ENV['JWT_KEY'], 'HS256'));
+            return $code;
+        } catch (ExpiredException $err) {
+            return "expired";
+        } catch (UnexpectedValueException $err) {
+            return "required";
+        }
     }
 }

@@ -24,7 +24,7 @@ class Model
 
         foreach ($data['where'] as $item) {
             if ($item[3] == true) {
-                $whereArr[] = " " . implode(" ", $item);
+                $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
             } else {
                 $item[2] = "'$item[2]'";
                 $whereArr[] = " " . implode(" ", $item);
@@ -42,12 +42,27 @@ class Model
         return $query->fetch();
     }
 
-    public function getAll($data)
+    public function getAll($data, $debug = false)
     {
+
+        if (empty($data['sort'])) {
+            $data['sort'] = [["created_at", "ASC"]];
+        }
+
+        $sort = "";
+        $sortArr = [];
+        foreach ($data['sort'] as $s) {
+            $sortArr[] = implode(" ", $s);
+        }
+
+        if (count($sortArr) > 0) {
+            $sort = "ORDER BY " . implode(", ", $sortArr);
+        }
+
         $limit = "";
         if (!empty($data['pagination'])) {
             $offset = ($data['pagination']['page'] - 1) * $data['pagination']['limit'];
-            $limit = "LIMIT $offset,$data[pagination][limit]";
+            $limit = "LIMIT $offset," . $data['pagination']['limit'];
         }
 
 
@@ -56,7 +71,7 @@ class Model
 
         foreach ($data['where'] as $item) {
             if ($item[3] == true) {
-                $whereArr[] = " " . implode(" ", $item);
+                $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
             } else {
                 $item[2] = "'$item[2]'";
                 $whereArr[] = " " . implode(" ", $item);
@@ -66,7 +81,14 @@ class Model
             $where = "WHERE " . implode(" AND ", $whereArr);
         }
 
-        $query = $this->db->query("SELECT * FROM $this->table $where $limit");
+        $sql = "SELECT * FROM $this->table $where $sort $limit";
+
+        if ($debug) {
+            print_r($sql);
+            die;
+        }
+
+        $query = $this->db->query($sql);
         $query->execute();
 
         return $query->fetchAll();
@@ -140,7 +162,7 @@ class Model
 
         foreach ($data['where'] as $item) {
             if ($item[3] == true) {
-                $whereArr[] = " " . implode(" ", $item);
+                $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
             } else {
                 $item[2] = "'$item[2]'";
                 $whereArr[] = " " . implode(" ", $item);
@@ -165,7 +187,7 @@ class Model
 
             foreach ($data['where'] as $item) {
                 if ($item[3] == true) {
-                    $whereArr[] = " " . implode(" ", $item);
+                    $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
                 } else {
                     $item[2] = "'$item[2]'";
                     $whereArr[] = " " . implode(" ", $item);
@@ -180,5 +202,26 @@ class Model
         } catch (Exception $err) {
             throw new Exception($err);
         }
+    }
+
+    public function checkDuplicate($column, $value)
+    {
+
+        $expValue = explode("-", $value);
+
+        if (count($expValue) > 1) {
+            if (is_numeric($expValue[count($expValue) - 1])) {
+                unset($expValue[count($expValue) - 1]);
+            }
+        }
+
+        $impValue = implode("-", $expValue);
+        $query = $this->db->query("SELECT $column, origin, number FROM (SELECT $column, cast(replace(replace($column, '$impValue',''),'-','') as int) as number, replace(replace($column, cast(replace(replace($column, '$impValue',''),'-','') as int),''),'-','') as origin FROM $this->table WHERE $column like '$impValue%') tbl WHERE origin='$impValue' ORDER BY number DESC; LIMIT 1");
+
+
+
+        $query->execute();
+
+        return $query->fetch();
     }
 }

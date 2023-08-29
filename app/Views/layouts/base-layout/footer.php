@@ -28,6 +28,32 @@
         body.style = ''
         backdropmodal.remove();
     }
+
+    function setAuth(value) {
+        localStorage.setItem("auth", JSON.stringify(value))
+    }
+
+    function getAuth() {
+        if (localStorage.getItem("auth")) {
+            return JSON.parse(localStorage.getItem("auth"))
+        }
+        return null
+    }
+
+    function removeAuth() {
+        localStorage.removeItem("auth")
+        window.location.reload()
+    }
+
+    if (!getAuth()) {
+        if (window.location.pathname + window.location.search !== "/admin?page=login") {
+            window.location.href = "/admin?page=login"
+        }
+    } else {
+        if (window.location.pathname + window.location.search === "/admin?page=login") {
+            window.location.href = "/admin"
+        }
+    }
 </script>
 
 </body>

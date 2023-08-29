@@ -4,10 +4,10 @@ namespace App\Models;
 
 use System\Model;
 
-class Path extends Model
+class Author extends Model
 {
 
-    public $table = "paths";
+    public $table = "authors";
 
     function __construct()
     {

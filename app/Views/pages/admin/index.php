@@ -1,41 +1,91 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
-
-            <div class="row">
-                <div class="col-sm-12">
-                    <div class="pull-right">
-                        <button class="btn btn-default" type="button" onclick="onOpenAddModal()">Add New</button>
+            <div class="pull-right">
+                <button class="btn btn-default" type="button" onclick="removeAuth()">Logout</button>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1 class="panel-title">
+                        Default Path
+                    </h1>
+                </div>
+                <div class="panel-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Name</th>
+                                    <th>Path</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1.</td>
+                                    <td>Login</td>
+                                    <td>/auth/login</td>
+                                </tr>
+                                <tr>
+                                    <td>2.</td>
+                                    <td>Register</td>
+                                    <td>/auth/register</td>
+                                </tr>
+                                <tr>
+                                    <td>3.</td>
+                                    <td>Author</td>
+                                    <td>/author/[username]</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>No.</th>
-                            <th>Name</th>
-                            <th>Path</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <?php foreach ($data as $key => $dt) : ?>
-                            <tr>
-                                <td><?= $key + 1 ?>.</td>
-                                <td><?= $dt->name ?></td>
-                                <td><?= $dt->full_path ?></td>
-                                <td>
-                                    <button class="btn btn-success" type="button" onclick="selectedEditId('<?= $dt->id ?>')">Edit</button>
-                                    <button class="btn btn-danger" type="button" onclick="selectedId('<?= $dt->id ?>')">Delete</button>
-                                    <?php if ($dt->type == "form") : ?>
-                                        <a class="btn btn-default" href="/admin<?= $dt->full_path ?>" role="button">Open</a>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h1 class="panel-title">Custom Path</h1>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div class="pull-right">
+                                <button class="btn btn-default" type="button" onclick="onOpenAddModal()">Add New</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>No.</th>
+                                    <th>Name</th>
+                                    <th>Path</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($data as $key => $dt) : ?>
+                                    <tr>
+                                        <td><?= $key + 1 ?>.</td>
+                                        <td><?= $dt->name ?></td>
+                                        <td><?= $dt->full_path ?></td>
+                                        <td>
+                                            <button class="btn btn-success" type="button" onclick="selectedEditId('<?= $dt->id ?>')">Edit</button>
+                                            <button class="btn btn-danger" type="button" onclick="selectedId('<?= $dt->id ?>')">Delete</button>
+                                            <?php if ($dt->type == "form") : ?>
+                                                <a class="btn btn-default" href="/admin<?= $dt->full_path ?>" role="button">Open</a>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -48,7 +98,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal('addModal')"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">New Path</h4>
             </div>
             <div class="modal-body">
@@ -255,7 +305,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="closeModal('editModal')"><span aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title" id="myModalLabel">Edit Path</h4>
             </div>
             <div class="modal-body">
@@ -525,7 +575,7 @@
             pathPrefix = e.target[name = 'parent'].value;
         }
 
-        var form = new URLSearchParams();
+        var form = new FormData();
         form.append('name', pathName);
         form.append('name_singular', pathName);
         form.append('name_plural', plural);

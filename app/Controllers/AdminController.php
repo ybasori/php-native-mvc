@@ -14,19 +14,16 @@ class AdminController extends Controller
     public function index()
     {
 
-        $requestUri = parse_url($_SERVER['REQUEST_URI']);
-        $path = array_filter(explode("/", $requestUri['path']));
-        unset($path[1]);
-        $fullpath = "/" . implode("/", $path);
+        $path = new Path;
+        $data = $path->getAll([]);
 
-        if ($fullpath == "/") {
-            $path = new Path;
-            $data = $path->getAll([]);
-
-            $this->view("layouts/base-layout/header");
+        $this->view("layouts/base-layout/header");
+        if ($_GET['page'] === "login") {
+            $this->view("pages/admin/login");
+        } else {
             $this->view("pages/admin/index", ["data" => $data]);
-            $this->view("layouts/base-layout/footer");
         }
+        $this->view("layouts/base-layout/footer");
     }
 
     public function show()
@@ -82,7 +79,7 @@ class AdminController extends Controller
         unset($dataPath['field']);
         $dataField = $_POST['field'];
 
-        $p = $path->checkExistingFullPath($dataPath['full_path']);
+        $p = $path->checkDuplicate("full_path", $dataPath['full_path']);
 
         if ($p) {
             $dataPath['full_path'] = $dataPath['full_path'] . "-" . ($p->number + 1);
