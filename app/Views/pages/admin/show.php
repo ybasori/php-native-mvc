@@ -8,7 +8,7 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <input id="path" class="form-control" value="/json<?= $path->realpath ?>" readonly />
+            <input id="path" class="form-control" value="/json/custom<?= $path->realpath ?>" readonly />
         </div>
     </div>
     <div class="row" id="data-array" style="display:none">
@@ -47,14 +47,143 @@
                     <thead>
                         <tr>
                             <th>No.</th>
-                            <th>Title</th>
-                            <th>Keyword</th>
-                            <th>Description</th>
+                            <th>
+                                <div class="pull-left">Title</div>
+                                <div class="pull-right">
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['title'] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('title','asc')">
+                                        <i class="glyphicon glyphicon-chevron-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['title'] == "desc" ? "active" : "" ?>" type="button" onclick="onChangeSort('title','desc')">
+                                        <i class="glyphicon glyphicon-chevron-down"></i>
+                                    </button>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="pull-left">Keyword</div>
+                                <div class="pull-right">
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['keywords'] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('keywords','asc')">
+                                        <i class="glyphicon glyphicon-chevron-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['keywords'] == "desc" ? "active" : "" ?>" type="button" onclick="onChangeSort('keywords','desc')">
+                                        <i class="glyphicon glyphicon-chevron-down"></i>
+                                    </button>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="pull-left">Description</div>
+                                <div class="pull-right">
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['description'] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('description','asc')">
+                                        <i class="glyphicon glyphicon-chevron-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['description'] == "desc" ? "active" : "" ?>" type="button" onclick="onChangeSort('description','desc')">
+                                        <i class="glyphicon glyphicon-chevron-down"></i>
+                                    </button>
+                                </div>
+                            </th>
+                            <?php foreach ($fields as $field) : ?>
+                                <th>
+                                    <div class="pull-left"><?= $field->label; ?></div>
+                                    <div class="pull-right">
+                                        <button class="btn btn-sm btn-default <?= $_GET['sort'][$field->name] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('<?= $field->name; ?>','asc')">
+                                            <i class="glyphicon glyphicon-chevron-up"></i>
+                                        </button>
+                                        <button class="btn btn-sm btn-default <?= $_GET['sort'][$field->name] == "desc" ? "active" : "" ?>" type="button" onclick="onChangeSort('<?= $field->name; ?>','desc')">
+                                            <i class="glyphicon glyphicon-chevron-down"></i>
+                                        </button>
+                                    </div>
+                                </th>
+                            <?php endforeach; ?>
+                            <th>
+                                <div class="pull-left">Created at</div>
+                                <div class="pull-right">
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['created_at'] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('created_at','asc')">
+                                        <i class="glyphicon glyphicon-chevron-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['created_at'] == "desc" ? "active" : "" ?>" type="button" onclick="onChangeSort('created_at','desc')">
+                                        <i class="glyphicon glyphicon-chevron-down"></i>
+                                    </button>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="pull-left">Updated at</div>
+                                <div class="pull-right">
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['updated_at'] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('updated_at','asc')">
+                                        <i class="glyphicon glyphicon-chevron-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['updated_at'] == "desc" ? "active" : "" ?>" type="button" onclick="onChangeSort('updated_at','desc')">
+                                        <i class="glyphicon glyphicon-chevron-down"></i>
+                                    </button>
+                                </div>
+                            </th>
+                            <th>
+                                <div class="pull-left">Created by</div>
+                                <div class="pull-right">
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['created_by'] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('created_by','asc')">
+                                        <i class="glyphicon glyphicon-chevron-up"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-default <?= $_GET['sort']['created_by'] == "desc" ? "active" : "btn-default" ?>" type="button" onclick="onChangeSort('created_by','desc')">
+                                        <i class="glyphicon glyphicon-chevron-down"></i>
+                                    </button>
+                                </div>
+                            </th>
                             <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-
+                        <tr>
+                            <td></td>
+                            <td>
+                                <form class="form-inline" onsubmit="onChangeSearch('title', event)">
+                                    <div class="form-group">
+                                        <input name="title" type="text" class="form-control" placeholder="Search by title" value="<?= $_GET['search']['title'] ?>">
+                                    </div>
+                                </form>
+                            </td>
+                            <td>
+                                <form class="form-inline" onsubmit="onChangeSearch('keywords', event)">
+                                    <div class="form-group">
+                                        <input name="keywords" type="text" class="form-control" placeholder="Search by keywords" value="<?= $_GET['search']['keywords'] ?>">
+                                    </div>
+                                </form>
+                            </td>
+                            <td>
+                                <form class="form-inline" onsubmit="onChangeSearch('description', event)">
+                                    <div class="form-group">
+                                        <input name="description" type="text" class="form-control" placeholder="Search by description" value="<?= $_GET['search']['description'] ?>">
+                                    </div>
+                                </form>
+                            </td>
+                            <?php foreach ($fields as $field) : ?>
+                                <td>
+                                    <form class="form-inline" onsubmit="onChangeSearch('<?= $field->name ?>', event)">
+                                        <div class="form-group">
+                                            <input name="<?= $field->name ?>" type="text" class="form-control" placeholder="Search by <?= $field->label ?>" value="<?= $_GET['search'][$field->name] ?>">
+                                        </div>
+                                    </form>
+                                </td>
+                            <?php endforeach; ?>
+                            <td>
+                                <form class="form-inline" onsubmit="onChangeSearch('created_at', event)">
+                                    <div class="form-group">
+                                        <input name="created_at" type="text" class="form-control" placeholder="Search by Created at" value="<?= $_GET['search']['created_at'] ?>">
+                                    </div>
+                                </form>
+                            </td>
+                            <td>
+                                <form class="form-inline" onsubmit="onChangeSearch('updated_at', event)">
+                                    <div class="form-group">
+                                        <input name="updated_at" type="text" class="form-control" placeholder="Search by Updated at" value="<?= $_GET['search']['updated_at'] ?>">
+                                    </div>
+                                </form>
+                            </td>
+                            <td>
+                                <form class="form-inline" onsubmit="onChangeSearch('created_by', event)">
+                                    <div class="form-group">
+                                        <input name="created_by" type="text" class="form-control" placeholder="Search by Created by" value="<?= $_GET['search']['created_by'] ?>">
+                                    </div>
+                                </form>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -72,19 +201,19 @@
                         <div class="form-group">
                             <label for="" class="col-sm-2 control-label">Title</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" placeholder="Title" name="title" autocomplete="off" onkeyup="onAlterSlug(event)" onchange="onAlterSlug(event)">
+                                <input type="text" class="form-control" placeholder="Title" name="title" autocomplete="off" onkeyup="onAlterSlug(event)" onchange="onAlterSlug(event)" />
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="" class="col-sm-2 control-label">Slug</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" placeholder="Slug" name="slug" autocomplete="off" readonly>
+                                <input type="text" class="form-control" placeholder="Slug" name="slug" autocomplete="off" readonly />
                             </div>
                         </div>
                         <div class="form-group">
                             <label for="" class="col-sm-2 control-label">Keywords</label>
                             <div class="col-sm-10">
-                                <input type="text" class="form-control" placeholder="Keywords" name="keywords" autocomplete="off">
+                                <input type="text" class="form-control" placeholder="Keywords" name="keywords" autocomplete="off" />
                             </div>
                         </div>
                         <div class="form-group">
@@ -223,6 +352,8 @@
     var total = 0;
     var limit = <?= !empty($_GET['limit']) ? $_GET['limit'] : "'all'" ?>;
     var page = <?= !empty($_GET['page']) ? $_GET['page'] : 1 ?>;
+    var sort = <?= !empty($_GET['sort']) ? json_encode((object) $_GET['sort']) : "{}" ?>;
+    var search = <?= !empty($_GET['search']) ? json_encode((object) $_GET['search']) : "{}" ?>;
 
 
     var elAlert = document.createElement("div");
@@ -234,6 +365,43 @@
     elAlertDgr.classList.add("alert");
     elAlertDgr.classList.add("alert-danger");
 
+    function onChangeSearch(name, e) {
+        e.preventDefault();
+        var getArr = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
+        search = {
+            ...search,
+            [name]: e.target[name = name].value
+        }
+        getArr = {
+            ...getArr,
+            search
+        };
+        onGetNewPath(getArr)
+    }
+
+    function onChangeSort(name, type) {
+        var getArr = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
+
+        var sIndex = Object.keys(sort).findIndex(function(item) {
+            return item === name
+        })
+
+        if (sIndex >= 0 && sort[name] == type) {
+            delete sort[name];
+        } else {
+            sort = {
+                ...sort,
+                [name]: type
+            }
+        }
+        getArr = {
+            ...getArr,
+            sort
+        };
+        onGetNewPath(getArr)
+
+    }
+
     function selectedDeleteId(path) {
         deleteId = path;
         openModal("deleteModal");
@@ -242,11 +410,13 @@
     function onGetNewPath(querySearch) {
 
         var path = document.getElementById("path").value;
-        var actualpath = `${path}`.substring(5);
+        var actualpath = `${path}`.substring(12);
+
+        var querySearchExp = expandJSON(querySearch);
 
         var querySearchArr = []
-        Object.keys(querySearch).forEach(function(key) {
-            querySearchArr = [...querySearchArr, `${key}=${querySearch[key]}`]
+        querySearchExp.forEach(function(item) {
+            querySearchArr = [...querySearchArr, `${item.label}=${item.value}`]
         })
 
         var querySearchStr = ""
@@ -289,13 +459,15 @@
 
     function onGetData() {
         var path = document.getElementById("path").value;
-        var actualpath = `${path}`.substring(5);
+        var actualpath = `${path}`.substring(12);
 
         var querySearch = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
 
+        var querySearchExp = expandJSON(querySearch);
+
         var querySearchArr = []
-        Object.keys(querySearch).forEach(function(key) {
-            querySearchArr = [...querySearchArr, `${key}=${querySearch[key]}`]
+        querySearchExp.forEach(function(item) {
+            querySearchArr = [...querySearchArr, `${item.label}=${item.value}`]
         })
 
         var querySearchStr = ""
@@ -310,6 +482,7 @@
             return res.json()
         }).then(function(result) {
             total = result.data.total;
+            var fields = <?= json_encode($fields) ?>;
             if (Array.isArray(result.data.data)) {
                 var no = 1;
                 if (limit != "all") {
@@ -317,13 +490,23 @@
                 }
                 var elementArray = document.getElementById("data-array");
                 elementArray.style.display = "block";
+
                 result.data.data.forEach((item) => {
+
+                    var fieldRow = ``;
+                    fields.forEach((field) => {
+                        fieldRow = `${fieldRow}<td>${item[field.name]}</td>`;
+                    });
                     elementArray.querySelector("tbody").innerHTML = elementArray.querySelector("tbody").innerHTML + `
                     <tr>
                         <td>${no}.</td>
                         <td>${item.title}</td>
                         <td>${item.keywords}</td>
                         <td>${item.description}</td>
+                        ${fieldRow}
+                        <td>${item.created_at}</td>
+                        <td>${item.updated_at}</td>
+                        <td>${item.created_by}</td>
                         <td><button class="btn btn-danger" type="button" onclick="selectedDeleteId('${actualpath}/${item.slug}')">Delete</button><a class="btn btn-default" href="/admin${actualpath}/${item.slug}" role="button">Open</a></td>
                     </tr>
                     `;
@@ -341,7 +524,6 @@
                 elFormEdit.querySelector("input[name=slug]").value = result.data.slug;
                 elFormEdit.querySelector("input[name=keywords]").value = result.data.keywords;
                 elFormEdit.querySelector("input[name=description]").value = result.data.description;
-                var fields = <?= json_encode($fields) ?>;
 
                 fields.forEach((item) => {
                     var selector = `input[name='field[${item.name}]']`;
@@ -360,7 +542,7 @@
     }
 
     function onDelete() {
-        fetch(`/json${deleteId}`, {
+        fetch(`/json/custom${deleteId}`, {
             method: "delete",
             headers: {
                 "Authorization": `Bearer ${getAuth().token}`

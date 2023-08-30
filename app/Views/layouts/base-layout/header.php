@@ -22,6 +22,102 @@
     <link rel="apple-touch-icon" href="/logo192.png" />
     <link rel="manifest" href="/manifest.json" />
     <link rel="stylesheet" href="/assets/bootstrap/css/bootstrap.min.css">
+    <script>
+        var backdropmodal = document.createElement("div");
+        backdropmodal.classList.add("modal-backdrop")
+        backdropmodal.classList.add("fade");
+
+        function onArrayForm(name, data, obj) {
+            var newObj = [...obj];
+            Object.keys(data).forEach(function(key) {
+                if (
+                    (Array.isArray(data[key]) || typeof data[key] === "object") &&
+                    !(data[key] instanceof File)
+                ) {
+                    newObj = onArrayForm(`${name}[${key}]`, data[key], newObj);
+                } else {
+                    newObj = [...newObj, {
+                        label: `${name}[${key}]`,
+                        value: data[key]
+                    }];
+                }
+            })
+            return newObj;
+        };
+
+        function expandJSON(data) {
+            var obj = [];
+            Object.keys(data).forEach(function(key) {
+                if (
+                    Array.isArray(data[key]) ||
+                    (typeof data[key] === "object" && !(data[key] instanceof File))
+                ) {
+                    obj = onArrayForm(`${key}`, data[key], obj);
+                } else {
+                    obj = [
+                        ...obj,
+                        {
+                            label: key,
+                            value: data[key],
+                        },
+                    ];
+                }
+            })
+            return obj;
+        };
+
+        function openModal(id) {
+            var el = document.getElementById(id);
+            el.style.display = 'block';
+            el.classList.add('in');
+            var body = document.body;
+            body.classList.add('modal-open');
+            body.style['padding-right'] = '17px'
+
+            body.appendChild(backdropmodal);
+            backdropmodal.classList.add("in")
+
+            return new Promise((resolve) => {
+                resolve();
+            })
+        }
+
+        function closeModal(id) {
+            var el = document.getElementById(id);
+            el.style.display = 'none';
+            el.classList.remove('in');
+            var body = document.body;
+            body.classList.remove('modal-open');
+            body.style = ''
+            backdropmodal.remove();
+        }
+
+        function setAuth(value) {
+            localStorage.setItem("auth", JSON.stringify(value))
+        }
+
+        function getAuth() {
+            if (localStorage.getItem("auth")) {
+                return JSON.parse(localStorage.getItem("auth"))
+            }
+            return null
+        }
+
+        function removeAuth() {
+            localStorage.removeItem("auth")
+            window.location.reload()
+        }
+
+        if (!getAuth()) {
+            if (window.location.pathname + window.location.search !== "/admin?page=login") {
+                window.location.href = "/admin?page=login"
+            }
+        } else {
+            if (window.location.pathname + window.location.search === "/admin?page=login") {
+                window.location.href = "/admin"
+            }
+        }
+    </script>
 </head>
 
 <body>

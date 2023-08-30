@@ -17,17 +17,17 @@ class DataItem extends Model
         $this->db = new DB;
     }
 
-    function getJoinFieldAll($fields, $data)
+    function getJoinFieldAll($fields, $data, $debug = false)
     {
 
         if (empty($data['sort'])) {
-            $data['sort'] = [["created_at", "ASC"]];
+            $data['sort'] = ["created_at" => "asc"];
         }
 
         $sort = "";
         $sortArr = [];
-        foreach ($data['sort'] as $s) {
-            $sortArr[] = implode(" ", $s);
+        foreach ($data['sort'] as $key => $s) {
+            $sortArr[] = $key . " " . ($s == "asc" ? "ASC" : "DESC");
         }
 
         if (count($sortArr) > 0) {
@@ -63,10 +63,16 @@ class DataItem extends Model
             $selectArr[] = "tbl_" . $field->name . "." . $field->name;
         }
 
+        $joinAuthor = "LEFT JOIN (SELECT username, id FROM authors) tbl_author ON " . $this->table . ".author_id_created_by = tbl_author.id";
+        $joinArr[] = $joinAuthor;
+        $selectArr[] = "tbl_author.username as created_by";
+
         $sql = "SELECT " . implode(",", $selectArr) . " FROM $this->table " . implode(" ", $joinArr) . " $where $sort $limit";
 
-        // print_r($sql);
-        // die;
+        if ($debug) {
+            print_r($sql);
+            die;
+        }
 
         $query = $this->db->query($sql);
         $query->execute();
@@ -100,6 +106,11 @@ class DataItem extends Model
             $selectArr[] = "tbl_" . $field->name . "." . $field->name;
         }
 
+        $joinAuthor = "LEFT JOIN (SELECT username, id FROM authors) tbl_author ON " . $this->table . ".author_id_created_by = tbl_author.id";
+        $joinArr[] = $joinAuthor;
+        $selectArr[] = "tbl_author.username as created_by";
+
+
         $sql = "SELECT " . implode(",", $selectArr) . " FROM $this->table " . implode(" ", $joinArr) . " $where";
 
         $query = $this->db->query($sql);
@@ -132,6 +143,10 @@ class DataItem extends Model
             $joinArr[] = "LEFT JOIN (SELECT " . ($field->type == "number" ? " cast(value as int)" : "value") . " as " . $field->name . ", data_item_id FROM data_fields WHERE field_form_id=" . $field->id . ") tbl_" . $field->name . " ON " . $this->table . ".id = tbl_" . $field->name . ".data_item_id";
             $selectArr[] = "tbl_" . $field->name . "." . $field->name;
         }
+
+        $joinAuthor = "LEFT JOIN (SELECT username, id FROM authors) tbl_author ON " . $this->table . ".author_id_created_by = tbl_author.id";
+        $joinArr[] = $joinAuthor;
+        $selectArr[] = "tbl_author.username as created_by";
 
         $sql = "SELECT COUNT(*) as total FROM (SELECT " . implode(",", $selectArr) . " FROM $this->table " . implode(" ", $joinArr) . " $where) tbl_main LIMIT 1";
 

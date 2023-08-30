@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Controllers;
+namespace App\Controllers\JSON;
 
 use App\Models\Author;
 use App\Models\DataField;
 use App\Models\DataItem;
 use App\Models\FieldForm;
 use App\Models\Path;
-use App\Models\User;
-use Firebase\JWT\JWT;
+use App\Controllers\Controller;
 
 class JSONController extends Controller
 {
@@ -17,33 +16,12 @@ class JSONController extends Controller
     {
 
         $dataItem = new DataItem;
-        // $data = $dataItem->get([
-        //     "where" => [
-        //         ["path_id", "=", $path_id],
-        //         ["slug", "=", $slug]
-        //     ]
-        // ]);
         $data = $dataItem->getJoinField($fields, [
             "where" => [
                 ["path_id", "=", $path_id],
                 ["slug", "=", $slug]
             ]
         ]);
-        if ($data) {
-
-            $author = new Author;
-            $a = $author->get([
-                "where" => [
-                    ["id", "=", $data->author_id_created_by]
-                ],
-            ]);
-            unset($a->id);
-            unset($a->user_id);
-            unset($data->id);
-            unset($data->path_id);
-            unset($data->author_id_created_by);
-            $data->created_by = $a;
-        }
         return $data;
     }
 
@@ -57,7 +35,7 @@ class JSONController extends Controller
 
     public function show()
     {
-        $cur = $this->getSelectedPath("/json");
+        $cur = $this->getSelectedPath("/json/custom");
 
 
         if ($cur['matched'] === false) {
@@ -84,6 +62,7 @@ class JSONController extends Controller
                 }
             } else {
                 $pagination = [];
+                $sort = !empty($_GET['sort']) ? $_GET['sort'] : [];
                 if (!empty($_GET['page']) && !empty($_GET['limit'])) {
                     $pagination = array_merge($pagination, [
                         "page" => $_GET['page'],
@@ -103,6 +82,7 @@ class JSONController extends Controller
                     ]);
                 }
 
+                $sort = count($sort) > 0 ? ["sort" => $sort] : [];
                 $pagination = count($pagination) > 0 ? ["pagination" => $pagination] : [];
                 $dataItem = new DataItem;
                 $clause = [
@@ -110,37 +90,10 @@ class JSONController extends Controller
                         ["path_id", "=", $cur['path_id']]
                     ]
                 ];
-                $data = $dataItem->getJoinFieldAll($fs, array_merge($clause, $pagination));
+                $data = $dataItem->getJoinFieldAll($fs, array_merge(array_merge($clause, $pagination), $sort));
 
                 $count = $dataItem->getTotalFieldJoin($fs, $clause);
 
-                $authorids = [];
-                foreach ($data as $key => $dt) {
-                    unset($data[$key]->id);
-                    unset($data[$key]->path_id);
-                    if (!in_array($dt->author_id_created_by, $authorids)) {
-                        $authorids[] = "'" . $dt->author_id_created_by . "'";
-                    }
-                }
-                if (count($authorids) > 0) {
-                    $author = new Author;
-                    $as = $author->getAll([
-                        "where" => [
-                            ["id", "IN", "(" . implode(", ", $authorids) . ")", true]
-                        ],
-                    ]);
-
-                    foreach ($data as $key => $dt) {
-                        foreach ($as as $a) {
-                            if ($dt->author_id_created_by == $a->id) {
-                                unset($data[$key]->author_id_created_by);
-                                unset($a->user_id);
-                                unset($a->id);
-                                $data[$key]->created_by = $a;
-                            }
-                        }
-                    }
-                }
                 $data = [
                     "data" => $data,
                     "total" => $count->total
@@ -162,7 +115,7 @@ class JSONController extends Controller
     public function store()
     {
 
-        $cur = $this->getSelectedPath("/json");
+        $cur = $this->getSelectedPath("/json/custom");
         if ($cur['matched']) {
             $dataItem = $_POST;
 
@@ -259,7 +212,7 @@ class JSONController extends Controller
     public function update()
     {
         parse_str(file_get_contents('php://input'), $_PUT);
-        $cur = $this->getSelectedPath("/json");
+        $cur = $this->getSelectedPath("/json/custom");
         if ($cur['matched']) {
             $dataItem = $_PUT;
             unset($dataItem['slug']);
@@ -369,7 +322,7 @@ class JSONController extends Controller
 
     public function delete()
     {
-        $cur = $this->getSelectedPath("/json");
+        $cur = $this->getSelectedPath("/json/custom");
         if ($cur['matched'] === false) {
             return $this->json([
                 "message" => "not found",
@@ -449,148 +402,7 @@ class JSONController extends Controller
         }
     }
 
-    public function login()
-    {
-        $dataLogin = $_POST;
-        unset($dataLogin['remember']);
 
-
-        $err = [];
-
-        if (empty($dataLogin['email'])) {
-            $err['email'][] = "E-mail is required!";
-        }
-        if (empty($dataLogin['password'])) {
-            $err['password'][] = "Password is required!";
-        }
-
-        if (count($err) > 0) {
-            return $this->json([
-                "message" => "Something went wrong!",
-                "data" => null,
-                "errors" => $err
-            ], 400);
-        }
-        $user = new User;
-        $usr = $user->get([
-            "where" => [
-                ["email", "=", $dataLogin['email']]
-            ]
-        ]);
-        if ($usr) {
-            if (password_verify($dataLogin['password'], $usr->password)) {
-                $author = new Author;
-                $mine = $author->get([
-                    "where" => [
-                        ["user_id", "=", $usr->id]
-                    ]
-                ]);
-                $mine = (object) array_merge((array) $mine, ["email" => $usr->email]);
-                $iat = time();
-                $exp = $iat + (1 * 60 * 60);
-                $key = $_ENV['JWT_KEY'];
-                $payload = array(
-                    "iss" => $_ENV['APP_URL'],
-                    "aud" => $_ENV['APP_URL'],
-                    "iat" => $iat,
-                    "exp" => $exp,
-                    "author" => $mine
-                );
-
-                $jwt = JWT::encode($payload, $key, 'HS256');
-
-                unset($mine->id);
-                unset($mine->user_id);
-
-                return $this->json([
-                    "message" => "Data found",
-                    "data" => array_merge((array)$mine, [
-                        "token" => $jwt,
-                        "expires" => $exp
-                    ]),
-                ]);
-            } else {
-
-                return $this->json([
-                    "message" => "Wrong email / password",
-                    "data" => null,
-                ], 400);
-            }
-        } else {
-            return $this->json([
-                "message" => "Wrong email / password",
-                "data" => null,
-            ], 400);
-        }
-    }
-
-    public function register()
-    {
-
-        $dataReg = $_POST;
-        unset($dataReg['retype_password']);
-
-        $dataAuthor = ["username" => $dataReg['username']];
-        unset($dataReg['username']);
-
-        $err = [];
-
-        if (empty($dataAuthor['username'])) {
-            $err['username'][] = "Username is required!";
-        }
-        if (empty($dataReg['email'])) {
-            $err['email'][] = "E-mail is required!";
-        }
-        if (empty($dataReg['password'])) {
-            $err['password'][] = "Password is required!";
-        }
-
-        $user = new User;
-        $author = new Author;
-        if (count($err) == 0) {
-
-            $checkEmail = $user->checkDuplicate("email", $dataReg['email']);
-            $checkUsername = $author->checkDuplicate("username", $dataAuthor['username']);
-
-            if ($checkEmail) {
-                $err['email'][] = "E-mail already registered";
-            }
-            if ($checkUsername) {
-                $err['username'][] = "Username already registered";
-            }
-
-            if (preg_match("/[^a-zA-Z0-9._\s]/i", $dataReg['username'])) {
-                $err['username'][] = "Only use alphanumeric, uppercase, lowercase, dot, and underscore";
-            }
-        }
-
-        if (count($err) > 0) {
-            return $this->json([
-                "message" => "Something went wrong!",
-                "data" => null,
-                "errors" => $err
-            ], 400);
-        }
-
-        $dataReg['password'] = password_hash($dataReg['password'], PASSWORD_DEFAULT);
-
-
-        $user_id = $user->insert(array_merge($dataReg, ["role" => "user"]));
-
-
-
-        if ($author->insert(array_merge($dataAuthor, ["user_id" => $user_id]))) {
-            return $this->json([
-                "message" => "Success Register",
-                "data" => $_POST
-            ]);
-        } else {
-            return $this->json([
-                "message" => "Something went wrong!",
-                "data" => null
-            ], 500);
-        }
-    }
 
     public function author($params)
     {
