@@ -16,13 +16,42 @@ class Model
         $this->db = new DB;
     }
 
-    public function get($data)
+    public function querySort($value = null)
     {
+        if (empty($value)) {
+            $value = ["created_at" => "asc"];
+        }
 
-        $where = "";
+        $sort = "";
+        $sortArr = [];
+        foreach ($value as $key => $s) {
+            $sortArr[] = $key . " " . ($s == "asc" ? "ASC" : "DESC");
+        }
+
+        if (count($sortArr) > 0) {
+            $sort = "ORDER BY " . implode(", ", $sortArr);
+        }
+
+        return $sort;
+    }
+
+    public function queryPagination($value)
+    {
+        $limit = "";
+        if (!empty($value)) {
+            $offset = ($value['page'] - 1) * $value['limit'];
+            $limit = "LIMIT $offset," . $value['limit'];
+        }
+
+        return $limit;
+    }
+
+    public function queryWhereClause($value)
+    {
+        $where = [];
         $whereArr = [];
 
-        foreach ($data['where'] as $item) {
+        foreach ($value['where'] as $item) {
             if ($item[3] == true) {
                 $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
             } else {
@@ -30,11 +59,34 @@ class Model
                 $whereArr[] = " " . implode(" ", $item);
             }
         }
+
+        $orWhereArr = [];
+        foreach ($value['orwhere'] as $item) {
+            if ($item[3] == true) {
+                $orWhereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
+            } else {
+                $item[2] = "'$item[2]'";
+                $orWhereArr[] = " " . implode(" ", $item);
+            }
+        }
         if (count($whereArr) > 0) {
-            $where = "WHERE " . implode(" AND ", $whereArr);
+            $where[] = implode(" AND ", $whereArr);
+        }
+        if (count($orWhereArr) > 0) {
+            $where[] = implode(" OR ", $orWhereArr);
         }
 
+        if (count($where) > 0) {
+            return "WHERE " . implode(" AND ", $where);
+        }
 
+        return "";
+    }
+
+    public function get($data)
+    {
+
+        $where = $this->queryWhereClause($data['where']);
 
         $query = $this->db->query("SELECT * FROM $this->table $where");
         $query->execute();
@@ -45,41 +97,11 @@ class Model
     public function getAll($data, $debug = false)
     {
 
-        if (empty($data['sort'])) {
-            $data['sort'] = [["created_at", "ASC"]];
-        }
+        $sort = $this->querySort($data['sort']);
 
-        $sort = "";
-        $sortArr = [];
-        foreach ($data['sort'] as $s) {
-            $sortArr[] = implode(" ", $s);
-        }
+        $limit = $this->queryPagination($data['pagination']);
 
-        if (count($sortArr) > 0) {
-            $sort = "ORDER BY " . implode(", ", $sortArr);
-        }
-
-        $limit = "";
-        if (!empty($data['pagination'])) {
-            $offset = ($data['pagination']['page'] - 1) * $data['pagination']['limit'];
-            $limit = "LIMIT $offset," . $data['pagination']['limit'];
-        }
-
-
-        $where = "";
-        $whereArr = [];
-
-        foreach ($data['where'] as $item) {
-            if ($item[3] == true) {
-                $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
-            } else {
-                $item[2] = "'$item[2]'";
-                $whereArr[] = " " . implode(" ", $item);
-            }
-        }
-        if (count($whereArr) > 0) {
-            $where = "WHERE " . implode(" AND ", $whereArr);
-        }
+        $where = $this->queryWhereClause($data['where']);
 
         $sql = "SELECT * FROM $this->table $where $sort $limit";
 
@@ -97,20 +119,7 @@ class Model
     public function getTotal($data)
     {
 
-        $where = "";
-        $whereArr = [];
-
-        foreach ($data['where'] as $item) {
-            if ($item[3] == true) {
-                $whereArr[] = " " . implode(" ", $item);
-            } else {
-                $item[2] = "'$item[2]'";
-                $whereArr[] = " " . implode(" ", $item);
-            }
-        }
-        if (count($whereArr) > 0) {
-            $where = "WHERE " . implode(" AND ", $whereArr);
-        }
+        $where = $this->queryWhereClause($data['where']);
 
         $query = $this->db->query("SELECT COUNT(*) as total FROM $this->table $where");
         $query->execute();

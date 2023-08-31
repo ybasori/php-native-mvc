@@ -8,7 +8,8 @@ use App\Middlewares\ExampleSuccessMiddleware;
 
 use App\Controllers\HomeController;
 use App\Controllers\AdminController;
-use App\Controllers\JSON\JSONController;
+use App\Controllers\JSON\CustomController;
+use App\Controllers\JSON\DefaultController;
 use App\Controllers\JSON\AuthController;
 use App\Controllers\ExampleController;
 
@@ -28,13 +29,13 @@ $router->delete("/admin", [AdminController::class, 'delete']);
 // default path
 $router->post("/json/auth/register", [AuthController::class, 'register']);
 $router->post("/json/auth/login", [AuthController::class, 'login']);
-$router->get("/json/author/:username", [JSONController::class, 'author']);
+$router->get("/json/author/:username", [DefaultController::class, 'author']);
 
 // custom path
-$router->get("/json/custom", [JSONController::class, 'index']);
-$router->get("/json/custom/:any", [JSONController::class, 'show']);
-$router->delete("/json/custom/:any", [JSONController::class, 'delete']);
-$router->post("/json/custom/:any", [JSONController::class, 'store']);
-$router->put("/json/custom/:any", [JSONController::class, 'update']);
+$router->get("/json/custom", [CustomController::class, 'index']);
+$router->get("/json/custom/:any", [CustomController::class, 'show']);
+$router->delete("/json/custom/:any", [CustomController::class, 'delete']);
+$router->post("/json/custom/:any", [CustomController::class, 'store']);
+$router->put("/json/custom/:any", [CustomController::class, 'update']);
 
 $router->run();

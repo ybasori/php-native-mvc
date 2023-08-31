@@ -20,41 +20,14 @@ class DataItem extends Model
     function getJoinFieldAll($fields, $data, $debug = false)
     {
 
-        if (empty($data['sort'])) {
-            $data['sort'] = ["created_at" => "asc"];
-        }
+        $sort = $this->querySort($data['sort']);
 
-        $sort = "";
-        $sortArr = [];
-        foreach ($data['sort'] as $key => $s) {
-            $sortArr[] = $key . " " . ($s == "asc" ? "ASC" : "DESC");
-        }
+        $limit = $this->queryPagination($data['pagination']);
 
-        if (count($sortArr) > 0) {
-            $sort = "ORDER BY " . implode(", ", $sortArr);
-        }
-
-
-        $limit = "";
-        if (!empty($data['pagination'])) {
-            $offset = ($data['pagination']['page'] - 1) * $data['pagination']['limit'];
-            $limit = "LIMIT $offset," . $data['pagination']['limit'];
-        }
-
-        $where = "";
-        $whereArr = [];
-
-        foreach ($data['where'] as $item) {
-            if ($item[3] == true) {
-                $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
-            } else {
-                $item[2] = "'$item[2]'";
-                $whereArr[] = " " . implode(" ", $item);
-            }
-        }
-        if (count($whereArr) > 0) {
-            $where = "WHERE " . implode(" AND ", $whereArr);
-        }
+        $where = $this->queryWhereClause([
+            "where" => $data['where'],
+            "orwhere" => $data['orwhere']
+        ]);
 
         $joinArr = [];
         $selectArr = [$this->table . ".*"];
@@ -84,20 +57,8 @@ class DataItem extends Model
     function getJoinField($fields, $data)
     {
 
-        $where = "";
-        $whereArr = [];
 
-        foreach ($data['where'] as $item) {
-            if ($item[3] == true) {
-                $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
-            } else {
-                $item[2] = "'$item[2]'";
-                $whereArr[] = " " . implode(" ", $item);
-            }
-        }
-        if (count($whereArr) > 0) {
-            $where = "WHERE " . implode(" AND ", $whereArr);
-        }
+        $where = $this->queryWhereClause($data['where']);
 
         $joinArr = [];
         $selectArr = [$this->table . ".*"];
@@ -122,20 +83,7 @@ class DataItem extends Model
     function getTotalFieldJoin($fields, $data)
     {
 
-        $where = "";
-        $whereArr = [];
-
-        foreach ($data['where'] as $item) {
-            if ($item[3] == true) {
-                $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
-            } else {
-                $item[2] = "'$item[2]'";
-                $whereArr[] = " " . implode(" ", $item);
-            }
-        }
-        if (count($whereArr) > 0) {
-            $where = "WHERE " . implode(" AND ", $whereArr);
-        }
+        $where = $this->queryWhereClause($data['where']);
 
         $joinArr = [];
         $selectArr = [$this->table . ".*"];

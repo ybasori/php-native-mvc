@@ -2,16 +2,15 @@
 
 namespace App\Controllers\JSON;
 
-use App\Models\Author;
 use App\Models\DataField;
 use App\Models\DataItem;
 use App\Models\FieldForm;
 use App\Models\Path;
 use App\Controllers\Controller;
 
-class JSONController extends Controller
+class CustomController extends Controller
 {
-
+    private $path = "/json/custom";
     private function getDetail($path_id, $slug, $fields)
     {
 
@@ -35,7 +34,7 @@ class JSONController extends Controller
 
     public function show()
     {
-        $cur = $this->getSelectedPath("/json/custom");
+        $cur = $this->getSelectedPath($this->path);
 
 
         if ($cur['matched'] === false) {
@@ -84,11 +83,18 @@ class JSONController extends Controller
 
                 $sort = count($sort) > 0 ? ["sort" => $sort] : [];
                 $pagination = count($pagination) > 0 ? ["pagination" => $pagination] : [];
+                $searchArr = [];
+                if (!empty($_GET['search'])) {
+                    foreach ($_GET['search'] as $key => $value) {
+                        $searchArr[] = [$key, "LIKE", '%' . $value . '%'];
+                    }
+                }
                 $dataItem = new DataItem;
                 $clause = [
                     "where" => [
                         ["path_id", "=", $cur['path_id']]
-                    ]
+                    ],
+                    "orwhere" => $searchArr
                 ];
                 $data = $dataItem->getJoinFieldAll($fs, array_merge(array_merge($clause, $pagination), $sort));
 
@@ -115,7 +121,7 @@ class JSONController extends Controller
     public function store()
     {
 
-        $cur = $this->getSelectedPath("/json/custom");
+        $cur = $this->getSelectedPath($this->path);
         if ($cur['matched']) {
             $dataItem = $_POST;
 
@@ -212,7 +218,7 @@ class JSONController extends Controller
     public function update()
     {
         parse_str(file_get_contents('php://input'), $_PUT);
-        $cur = $this->getSelectedPath("/json/custom");
+        $cur = $this->getSelectedPath($this->path);
         if ($cur['matched']) {
             $dataItem = $_PUT;
             unset($dataItem['slug']);
@@ -322,7 +328,7 @@ class JSONController extends Controller
 
     public function delete()
     {
-        $cur = $this->getSelectedPath("/json/custom");
+        $cur = $this->getSelectedPath($this->path);
         if ($cur['matched'] === false) {
             return $this->json([
                 "message" => "not found",
@@ -400,31 +406,5 @@ class JSONController extends Controller
                 ], 404);
             }
         }
-    }
-
-
-
-    public function author($params)
-    {
-        $author = new Author;
-
-        $a = $author->get([
-            "where" => [
-                ["username", "=", $params->username]
-            ]
-        ]);
-
-        if ($a) {
-            unset($a->id);
-            unset($a->user_id);
-            return $this->json([
-                "message" => "Data found",
-                "data" => $a,
-            ], 200);
-        }
-        return $this->json([
-            "message" => "Data not found",
-            "data" => null,
-        ], 404);
     }
 }
