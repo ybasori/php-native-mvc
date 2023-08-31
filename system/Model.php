@@ -52,21 +52,25 @@ class Model
         $whereArr = [];
 
         foreach ($value['where'] as $item) {
-            if ($item[3] == true) {
-                $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
-            } else {
-                $item[2] = "'$item[2]'";
-                $whereArr[] = " " . implode(" ", $item);
+            if ($item[2] !== "") {
+                if ($item[3] == true) {
+                    $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
+                } else {
+                    $item[2] = "'$item[2]'";
+                    $whereArr[] = " " . implode(" ", $item);
+                }
             }
         }
 
         $orWhereArr = [];
         foreach ($value['orwhere'] as $item) {
-            if ($item[3] == true) {
-                $orWhereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
-            } else {
-                $item[2] = "'$item[2]'";
-                $orWhereArr[] = " " . implode(" ", $item);
+            if ($item[2] !== "") {
+                if ($item[3] == true) {
+                    $orWhereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
+                } else {
+                    $item[2] = "'$item[2]'";
+                    $orWhereArr[] = " " . implode(" ", $item);
+                }
             }
         }
         if (count($whereArr) > 0) {

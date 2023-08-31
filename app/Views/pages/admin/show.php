@@ -135,21 +135,21 @@
                             <td>
                                 <form class="form-inline" onsubmit="onChangeSearch('title', event)">
                                     <div class="form-group">
-                                        <input name="title" type="text" class="form-control" placeholder="Search by title" value="<?= $_GET['search']['title'] ?>">
+                                        <input name="title" type="text" class="form-control" placeholder="Search by title" value="<?= preg_replace("/%/i", "",  $_GET['search']['title']) ?>">
                                     </div>
                                 </form>
                             </td>
                             <td>
                                 <form class="form-inline" onsubmit="onChangeSearch('keywords', event)">
                                     <div class="form-group">
-                                        <input name="keywords" type="text" class="form-control" placeholder="Search by keywords" value="<?= $_GET['search']['keywords'] ?>">
+                                        <input name="keywords" type="text" class="form-control" placeholder="Search by keywords" value="<?= preg_replace("/%/i", "",  $_GET['search']['keywords']) ?>">
                                     </div>
                                 </form>
                             </td>
                             <td>
                                 <form class="form-inline" onsubmit="onChangeSearch('description', event)">
                                     <div class="form-group">
-                                        <input name="description" type="text" class="form-control" placeholder="Search by description" value="<?= $_GET['search']['description'] ?>">
+                                        <input name="description" type="text" class="form-control" placeholder="Search by description" value="<?= preg_replace("/%/i", "",  $_GET['search']['description']) ?>">
                                     </div>
                                 </form>
                             </td>
@@ -157,7 +157,7 @@
                                 <td>
                                     <form class="form-inline" onsubmit="onChangeSearch('<?= $field->name ?>', event)">
                                         <div class="form-group">
-                                            <input name="<?= $field->name ?>" type="text" class="form-control" placeholder="Search by <?= $field->label ?>" value="<?= $_GET['search'][$field->name] ?>">
+                                            <input name="<?= $field->name ?>" type="text" class="form-control" placeholder="Search by <?= $field->label ?>" value="<?= preg_replace("/%/i", "",  $_GET['search'][$field->name]) ?>">
                                         </div>
                                     </form>
                                 </td>
@@ -165,21 +165,21 @@
                             <td>
                                 <form class="form-inline" onsubmit="onChangeSearch('created_at', event)">
                                     <div class="form-group">
-                                        <input name="created_at" type="text" class="form-control" placeholder="Search by Created at" value="<?= $_GET['search']['created_at'] ?>">
+                                        <input name="created_at" type="text" class="form-control" placeholder="Search by Created at" value="<?= preg_replace("/%/i", "",  $_GET['search']['created_at']) ?>">
                                     </div>
                                 </form>
                             </td>
                             <td>
                                 <form class="form-inline" onsubmit="onChangeSearch('updated_at', event)">
                                     <div class="form-group">
-                                        <input name="updated_at" type="text" class="form-control" placeholder="Search by Updated at" value="<?= $_GET['search']['updated_at'] ?>">
+                                        <input name="updated_at" type="text" class="form-control" placeholder="Search by Updated at" value="<?= preg_replace("/%/i", "",  $_GET['search']['updated_at']) ?>">
                                     </div>
                                 </form>
                             </td>
                             <td>
                                 <form class="form-inline" onsubmit="onChangeSearch('created_by', event)">
                                     <div class="form-group">
-                                        <input name="created_by" type="text" class="form-control" placeholder="Search by Created by" value="<?= $_GET['search']['created_by'] ?>">
+                                        <input name="created_by" type="text" class="form-control" placeholder="Search by Created by" value="<?= preg_replace("/%/i", "",  $_GET['search']['created_by']) ?>">
                                     </div>
                                 </form>
                             </td>
@@ -368,9 +368,13 @@
     function onChangeSearch(name, e) {
         e.preventDefault();
         var getArr = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
-        search = {
-            ...search,
-            [name]: e.target[name = name].value
+        if (e.target[name = name].value == "") {
+            delete search[name];
+        } else {
+            search = {
+                ...search,
+                [name]: `%${e.target[name = name].value}%`
+            }
         }
         getArr = {
             ...getArr,

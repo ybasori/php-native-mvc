@@ -86,7 +86,7 @@ class CustomController extends Controller
                 $searchArr = [];
                 if (!empty($_GET['search'])) {
                     foreach ($_GET['search'] as $key => $value) {
-                        $searchArr[] = [$key, "LIKE", '%' . $value . '%'];
+                        $searchArr[] = [$key, "LIKE", $value];
                     }
                 }
                 $dataItem = new DataItem;
