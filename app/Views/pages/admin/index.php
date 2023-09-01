@@ -106,14 +106,14 @@
                     <div class="form-group">
                         <label for="" class="col-sm-2 control-label">Name</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" placeholder="Name" name="name" onkeyup="onAlterPath(event, 'addModal')" onchange="onAlterPath(event, 'addModal')" required autocomplete="off">
+                            <input type="text" class="form-control" placeholder="Name" name="name" onkeyup="onAlterPath(event, 'addModal')" onchange="onAlterPath(event, 'addModal')" autocomplete="off">
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="" class="col-sm-2 control-label">Type</label>
                         <div class="col-sm-10">
-                            <select type="text" class="form-control" name="type" onchange="onChangeType(event, 'addModal')" required>
-                                <option hidden>Type</option>
+                            <select type="text" class="form-control" name="type" onchange="onChangeType(event, 'addModal')">
+                                <option value="" hidden>Type</option>
                                 <option value="path">Path</option>
                                 <option value="form">Form</option>
                             </select>
@@ -122,15 +122,38 @@
                     <div class="form-group">
                         <label for="" class="col-sm-2 control-label">Parent</label>
                         <div class="col-sm-10">
-                            <select type="text" class="form-control" name="parent">
-                                <option value="0" selected hidden>(Optional)</option>
+                            <select type="text" class="form-control" name="parent_id">
+                                <option value="" selected hidden>(Optional)</option>
                             </select>
                         </div>
                     </div>
                     <div class="form-group">
                         <label for="" class="col-sm-2 control-label">Path</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" id="" placeholder="path" name="path" readonly>
+                            <input type="text" class="form-control input-path" placeholder="path" readonly>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">Privacy</label>
+                        <div class="col-sm-10">
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="privacy" value="none" checked>
+                                    None
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="privacy" value="only-logged-in-user">
+                                    Only logged in user
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="privacy" value="only-me">
+                                    Only user him or her self
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div id="if-type-form" style="display:none">
@@ -143,131 +166,31 @@
                             <div class="panel-body">
                                 <div class="panel-group">
                                     <div class="panel panel-default">
-                                        <div class="panel-heading" role="tab" id="headingOne" onclick="collapsePanel(event)">
+                                        <div class="panel-heading" role="tab">
                                             <h4 class="panel-title">
-                                                Title (default field)
+                                                Title
                                             </h4>
-                                        </div>
-                                        <div class="panel-collapse collapse">
-                                            <div class="panel-body">
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Field Label</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Label" value="Title" readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Field Name</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Name" value="title" readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Type</label>
-                                                    <div class="col-sm-10">
-                                                        <select class="form-control" placeholder="Type" readonly>
-                                                            <option hidden>Type</option>
-                                                            <option value="text" selected>Text</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="panel panel-default">
-                                        <div class="panel-heading" role="tab" id="headingOne" onclick="collapsePanel(event)">
+                                        <div class="panel-heading" role="tab">
                                             <h4 class="panel-title">
-                                                Slug (default field)
+                                                Slug
                                             </h4>
-                                        </div>
-                                        <div class="panel-collapse collapse">
-                                            <div class="panel-body">
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Field Label</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Label" value="Slug" readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Field Name</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Name" value="slug" readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Type</label>
-                                                    <div class="col-sm-10">
-                                                        <select class="form-control" placeholder="Type" readonly>
-                                                            <option hidden>Type</option>
-                                                            <option value="text" selected>Text</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="panel panel-default">
-                                        <div class="panel-heading" role="tab" id="headingOne" onclick="collapsePanel(event)">
+                                        <div class="panel-heading" role="tab">
                                             <h4 class="panel-title">
-                                                Description (default field)
+                                                Description
                                             </h4>
-                                        </div>
-                                        <div class="panel-collapse collapse">
-                                            <div class="panel-body">
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Field Label</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Label" value="Description" readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Field Name</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Name" value="description" readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Type</label>
-                                                    <div class="col-sm-10">
-                                                        <select class="form-control" placeholder="Type" readonly>
-                                                            <option hidden>Type</option>
-                                                            <option value="text" selected>Text</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                     <div class="panel panel-default">
-                                        <div class="panel-heading" role="tab" id="headingOne" onclick="collapsePanel(event)">
+                                        <div class="panel-heading" role="tab">
                                             <h4 class="panel-title">
-                                                Keywords (default field)
+                                                Keywords
                                             </h4>
-                                        </div>
-                                        <div class="panel-collapse collapse">
-                                            <div class="panel-body">
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Field Label</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Label" value="Keywords" readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Field Name</label>
-                                                    <div class="col-sm-10">
-                                                        <input type="text" class="form-control" id="" placeholder="Field Name" value="keywords" readonly>
-                                                    </div>
-                                                </div>
-                                                <div class="form-group">
-                                                    <label for="" class="col-sm-2 control-label">Type</label>
-                                                    <div class="col-sm-10">
-                                                        <select class="form-control" placeholder="Type" readonly>
-                                                            <option hidden>Type</option>
-                                                            <option value="text" selected>Text</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -313,7 +236,7 @@
                     <div class="form-group">
                         <label for="" class="col-sm-2 control-label">Name</label>
                         <div class="col-sm-10">
-                            <input type="text" class="form-control" placeholder="Name" name="name" required autocomplete="off">
+                            <input type="text" class="form-control" placeholder="Name" name="name" autocomplete="off">
                         </div>
                     </div>
 
@@ -357,6 +280,18 @@
     var pathType = null;
     var editId = null;
 
+    var numberField = 0;
+
+
+    var elAlert = document.createElement("div");
+    elAlert.classList.add("alert");
+    elAlert.classList.add("alert-success");
+
+
+    var elAlertDgr = document.createElement("div");
+    elAlertDgr.classList.add("alert");
+    elAlertDgr.classList.add("alert-danger");
+
     function onAlterHeader(e) {
 
         e.target.parentElement.parentElement.parentElement.parentElement.parentElement.querySelector(".panel-title").innerHTML = e.target.value === "" ? "Field" : e.target.value
@@ -385,7 +320,7 @@
             name = name.toLowerCase()
         }
 
-        document.getElementById(id).querySelector("input[name=path]").setAttribute("value", name)
+        document.getElementById(id).querySelector(".input-path").setAttribute("value", name)
     }
 
     function onAlterPath(e, id) {
@@ -417,21 +352,21 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Field Label</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="Field Label" name="field[][label]" required autocomplete="off" onkeyup="onAlterHeader(event)" onchange="onAlterHeader(event)">
+                        <input type="text" class="form-control" placeholder="Field Label" name="field[${numberField}][label]"  autocomplete="off" onkeyup="onAlterHeader(event)" onchange="onAlterHeader(event)">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Field Name</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="Field Name" name="field[][name]" required autocomplete="off">
+                        <input type="text" class="form-control" placeholder="Field Name" name="field[${numberField}][name]"  autocomplete="off">
                     </div>
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Type</label>
                     <div class="col-sm-10">
-                        <select class="form-control" placeholder="Type" name="field[][type]" required>
-                            <option hidden>Type</option>
-                            <option value="text">Number</option>
+                        <select class="form-control" placeholder="Type" name="field[${numberField}][type]" >
+                            <option value="" hidden>Type</option>
+                            <option value="number">Number</option>
                             <option value="text">Text</option>
                             <option value="textarea">Text Area</option>
                         </select>
@@ -440,7 +375,7 @@
                 <div class="form-group">
                     <label class="col-sm-2 control-label">Default Value</label>
                     <div class="col-sm-10">
-                        <input type="text" class="form-control" placeholder="Default Value" name="field[][default_value]" autocomplete="off">
+                        <input type="text" class="form-control" placeholder="Default Value" name="field[${numberField}][default_value]" autocomplete="off">
                     </div>
                 </div>
                 <div class="form-group">
@@ -454,6 +389,7 @@
         panelEl.innerHTML = html;
 
         document.getElementById("field-list").appendChild(panelEl);
+        numberField += 1;
     }
 
     function removeField(e) {
@@ -479,18 +415,22 @@
     function arrToModalById(arr, id, value = null) {
         var data = null;
         allPath = arr;
-        arr.forEach(function(item) {
-            var opt = document.createElement("option");
-            opt.text = item.full_path
-            opt.value = item.full_path
-            if (value !== null && item.id === Number(value)) {
-                data = item;
-            }
+        arr
+            .filter(function(item) {
+                return item.type == "path"
+            })
+            .forEach(function(item) {
+                var opt = document.createElement("option");
+                opt.text = item.full_path
+                opt.value = item.id
+                if (value !== null && item.id === Number(value)) {
+                    data = item;
+                }
 
-            if (id != "editModal") {
-                document.getElementById(id).querySelector("select[name='parent']").appendChild(opt)
-            }
-        })
+                if (id != "editModal") {
+                    document.getElementById(id).querySelector("select[name='parent']").appendChild(opt)
+                }
+            })
 
         if (data !== null && id === "editModal") {
             var modalEl = document.getElementById(id)
@@ -521,12 +461,12 @@
     function onDelete() {
         fetch(`/admin?id=${selected}`, {
             method: "delete"
-        }).then(function() {
-            selected = null;
-            closeModal("deleteModal");
-            window.location.reload();
-        }).catch(function() {
-            closeModal("deleteModal");
+        }).then(function(res) {
+            if (res.status >= 200 && res.status < 300) {
+                selected = null;
+                closeModal("deleteModal");
+                window.location.reload();
+            }
         })
     }
 
@@ -544,6 +484,7 @@
                 arrToModalById(allPath, "addModal")
             }
         })
+        numberField = 0;
     }
 
     function onSubmitEdit(e) {
@@ -562,82 +503,45 @@
     function onSubmit(e) {
         e.preventDefault();
 
-        var pathName = e.target[name = 'name'].value;
-        var plural = e.target[name = 'name'].value;
-        if (plural[plural.length - 1] == "y") {
-            plural = plural.substring(0, plural.length - 1);
-            plural = plural + "ies";
-        } else {
-            plural = plural + "s";
-        }
-        var pathPrefix = "";
-        if (e.target[name = 'parent'].value !== "0") {
-            pathPrefix = e.target[name = 'parent'].value;
-        }
 
-        var form = new FormData();
-        form.append('name', pathName);
-        form.append('name_singular', pathName);
-        form.append('name_plural', plural);
-        form.append('full_path', `${pathPrefix}/${e.target[name = 'path'].value}`);
-        form.append('type', `${e.target[name = 'type'].value}`);
-        form.append('path', `${e.target[name = 'path'].value}`);
-
-        if (e.target[name = 'parent'].value !== "0") {
-            form.append("parent_id", allPath[allPath.findIndex((item) => item.full_path == pathPrefix)].id)
-        }
-
-        if (e.target[name = 'type'].value === 'form') {
-            form.append('resources_json', JSON.stringify(["index", "show", "store", "update", "delete"]));
-            if (e.target[name = 'field[][label]']) {
-                const fieldLabel = e.target[name = 'field[][label]'];
-                if (fieldLabel.length === undefined) {
-                    form.append("field[0][label]", fieldLabel.value)
-                } else {
-                    fieldLabel.forEach((item, index) => {
-                        form.append("field[" + index + "][label]", item.value)
-                    })
-                }
-            }
-            if (e.target[name = 'field[][name]']) {
-                const fieldName = e.target[name = 'field[][name]'];
-                if (fieldName.length === undefined) {
-                    form.append("field[0][name]", fieldName.value)
-                } else {
-                    fieldName.forEach((item, index) => {
-                        form.append("field[" + index + "][name]", item.value)
-                    })
-                }
-            }
-            if (e.target[name = 'field[][type]']) {
-                const fieldType = e.target[name = 'field[][type]'];
-                if (fieldType.length === undefined) {
-                    form.append("field[0][type]", fieldType.value)
-                } else {
-                    fieldType.forEach((item, index) => {
-                        form.append("field[" + index + "][type]", item.value)
-                    })
-                }
-            }
-            if (e.target[name = 'field[][default_value]']) {
-                const defaultValue = e.target[name = 'field[][default_value]'];
-                if (defaultValue.length === undefined) {
-                    form.append("field[0][default_value]", defaultValue.value)
-                } else {
-                    defaultValue.forEach((item, index) => {
-                        form.append("field[" + index + "][default_value]", item.value)
-                    })
-                }
-            }
-        } else {
-            form.append('resources_json', JSON.stringify(["index"]));
-        }
+        var form = new FormData(e.target);
 
         fetch("/admin", {
             method: "post",
             body: form
         }).then(function(res) {
-            window.location.reload();
+            res.json().then(function(data) {
+                if (res.status >= 200 && res.status < 300) {
+                    window.location.reload();
+                } else if (res.status >= 400 && res.status < 500) {
+                    elAlertDgr.innerHTML = "";
+                    if (data.errors) {
+                        var ul = document.createElement("ul");
+                        Object.keys(data.errors).forEach(function(name) {
+                            data.errors[name].forEach(function(item) {
+                                var li = document.createElement("li");
+                                li.innerHTML = item;
+                                ul.appendChild(li);
+
+                            })
+                        })
+
+                        elAlertDgr.appendChild(ul);
+                    } else {
+                        elAlertDgr.innerHTML = data.message;
+                    }
+                    document.querySelector("#addModal .modal-body").appendChild(elAlertDgr);
+                    setTimeout(function() {
+                        elAlertDgr.remove();
+                    }, 1000)
+                } else {
+                    elAlertDgr.innerHTML = "Something went wrong!";
+                    document.querySelector("#addModal .modal-body").appendChild(elAlertDgr);
+                    setTimeout(function() {
+                        elAlertDgr.remove();
+                    }, 1000)
+                }
+            })
         })
     }
 </script>

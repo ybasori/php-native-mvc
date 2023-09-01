@@ -482,6 +482,9 @@
 
         fetch(`${path}${querySearchStr}`, {
             method: "get",
+            headers: {
+                "Authorization": `Bearer ${getAuth().token}`
+            }
         }).then(function(res) {
             return res.json()
         }).then(function(result) {

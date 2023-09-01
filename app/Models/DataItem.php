@@ -17,6 +17,22 @@ class DataItem extends Model
         $this->db = new DB;
     }
 
+    function getJoinPathByPath($prefix, $path, $debug = false)
+    {
+        $sql = "SELECT * FROM (SELECT CONCAT('" . $prefix . "', CONCAT(paths.full_path, CONCAT('/', " . $this->table . ".slug))) as pathname, " . $this->table . ".id, " . $this->table . ".path_id, paths.full_path, paths.privacy  FROM " . $this->table . " JOIN paths ON " . $this->table . ".path_id = paths.id) tbl WHERE pathname = '" . $path . "'";
+
+
+        if ($debug) {
+            print_r($sql);
+            die;
+        }
+
+        $query = $this->db->query($sql);
+        $query->execute();
+
+        return $query->fetch();
+    }
+
     function getJoinFieldAll($fields, $data, $debug = false)
     {
 
@@ -36,11 +52,13 @@ class DataItem extends Model
             $selectArr[] = "tbl_" . $field->name . "." . $field->name;
         }
 
-        $joinAuthor = "LEFT JOIN (SELECT username, id FROM authors) tbl_author ON " . $this->table . ".author_id_created_by = tbl_author.id";
+        $joinAuthor = "LEFT JOIN (SELECT * FROM authors) tbl_author ON " . $this->table . ".author_id_created_by = tbl_author.id";
         $joinArr[] = $joinAuthor;
         $selectArr[] = "tbl_author.username as created_by";
 
-        $sql = "SELECT " . implode(",", $selectArr) . " FROM $this->table " . implode(" ", $joinArr) . " $where $sort $limit";
+        $sql = "SELECT " . implode(",", $selectArr) . " FROM $this->table " . implode(" ", $joinArr);
+
+        $sql = "SELECT * FROM ($sql) tbl $where $sort $limit";
 
         if ($debug) {
             print_r($sql);
@@ -54,11 +72,14 @@ class DataItem extends Model
     }
 
 
-    function getJoinField($fields, $data)
+    function getJoinField($fields, $data, $debug = false)
     {
 
 
-        $where = $this->queryWhereClause($data['where']);
+        $where = $this->queryWhereClause([
+            "where" => $data['where'],
+            "orwhere" => $data['orwhere']
+        ]);
 
         $joinArr = [];
         $selectArr = [$this->table . ".*"];
@@ -71,8 +92,14 @@ class DataItem extends Model
         $joinArr[] = $joinAuthor;
         $selectArr[] = "tbl_author.username as created_by";
 
+        $sql = "SELECT " . implode(",", $selectArr) . " FROM " . $this->table . " " . implode(" ", $joinArr);
 
-        $sql = "SELECT " . implode(",", $selectArr) . " FROM $this->table " . implode(" ", $joinArr) . " $where";
+        $sql = "SELECT * FROM (" . $sql . ") tbl_main " . $where;
+
+        if ($debug) {
+            print_r($sql);
+            die;
+        }
 
         $query = $this->db->query($sql);
         $query->execute();
@@ -83,7 +110,10 @@ class DataItem extends Model
     function getTotalFieldJoin($fields, $data)
     {
 
-        $where = $this->queryWhereClause($data['where']);
+        $where = $this->queryWhereClause([
+            "where" => $data['where'],
+            "orwhere" => $data['orwhere']
+        ]);
 
         $joinArr = [];
         $selectArr = [$this->table . ".*"];

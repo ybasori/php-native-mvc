@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 
+use App\Models\DataItem;
 use App\Models\Path;
 use Exception;
 use System\Response;
@@ -9,6 +10,7 @@ use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
 use UnexpectedValueException;
+
 
 class Controller extends Response
 {
@@ -72,69 +74,38 @@ class Controller extends Response
         $requestUri = parse_url($_SERVER['REQUEST_URI']);
         $requestPath = $requestUri['path'];
         $path = new Path;
-        $data_path = $path->getAll([]);
-
-
-        $params = [];
-        $matched = false;
-        $selectedPath = "";
-        $selectedActualPath = "";
-        $path_id = null;
-        foreach ($data_path as $value) {
-
-            if ($matched == false) {
-
-                foreach (json_decode($value->resources_json) as $resource) {
-
-                    $fullpath = $value->full_path;
-                    if ($matched == false) {
-                        $m = [
-                            "path" => "",
-                            "fullpath" => "",
-                            "matched" => false,
-                            "params" => []
-                        ];
-                        if ($_SERVER['REQUEST_METHOD'] == "GET") {
-                            switch ($resource) {
-                                case 'index':
-                                    $m = $this->matchingPath($requestPath, $prefix, $fullpath, "");
-                                    break;
-                                case 'show':
-                                    $m = $this->matchingPath($requestPath, $prefix, $fullpath, "/:slug");
-                                    break;
-                                default:
-                                    $m = $this->matchingPath($requestPath, $prefix, $fullpath, "");
-                                    break;
-                            }
-                        }
-                        if ($matched == false && $_SERVER['REQUEST_METHOD'] == "POST" && $resource == "store") {
-                            $m = $this->matchingPath($requestPath, $prefix, $fullpath, "");
-                        }
-                        if ($matched == false && $_SERVER['REQUEST_METHOD'] == "PUT" && $resource == "update") {
-                            $m = $this->matchingPath($requestPath, $prefix, $fullpath, "/:slug");
-                        }
-                        if ($matched == false && $_SERVER['REQUEST_METHOD'] == "DELETE" && $resource == "delete") {
-                            $m = $this->matchingPath($requestPath, $prefix, $fullpath, "/:slug");
-                        }
-                        $matched = $m['matched'];
-                        $params = $m['params'];
-                        $selectedPath = $m['path'];
-                        $selectedActualPath = $m['fullpath'];
-                        if ($matched) {
-                            $path_id = $value->id;
-                        }
-                    }
-                }
+        $p = $path->getByPath($prefix, $requestPath);
+        if ($p) {
+            return [
+                "type" => "index",
+                "data" => [
+                    "path_id" => $p->id,
+                    "full_path" => $p->full_path,
+                    "pathname" => $p->pathname,
+                    "privacy" => $p->privacy,
+                ]
+            ];
+        } else {
+            $dataItem = new DataItem;
+            $d = $dataItem->getJoinPathByPath($prefix, $requestPath);
+            if ($d) {
+                return [
+                    "type" => "detail",
+                    "data" => [
+                        "path_id" => $d->path_id,
+                        "full_path" => $d->full_path,
+                        "pathname" => $d->pathname,
+                        "privacy" => $d->privacy,
+                        "data_item_id" => $d->id,
+                    ]
+                ];
+            } else {
+                return [
+                    "type" => "none",
+                    "data" => []
+                ];
             }
         }
-
-        return [
-            "matched" => $matched,
-            "path" => $selectedPath,
-            "actualpath" => $selectedActualPath,
-            "params" => $params,
-            "path_id" => $path_id
-        ];
     }
 
     public function getUser()

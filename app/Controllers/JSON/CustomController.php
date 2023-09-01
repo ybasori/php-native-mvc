@@ -34,95 +34,175 @@ class CustomController extends Controller
 
     public function show()
     {
+
         $cur = $this->getSelectedPath($this->path);
 
+        $fields = new FieldForm;
+        if ($cur['type'] === "index") {
 
-        if ($cur['matched'] === false) {
+            $authorQuery = [];
+            if ($cur['data']['privacy'] == "only-me" || $cur['data']['privacy'] == "only-logged-in-user") {
+                $user = $this->getUser();
+                if ($user === "expired") {
+                    return $this->json([
+                        "message" => "Something went wrong!",
+                        "data" => null,
+                        "errors" => [
+                            'token' => ["Token is expired!"]
+                        ]
+                    ], 401);
+                } else if ($user === "required") {
+                    return $this->json([
+                        "message" => "Something went wrong!",
+                        "data" => null,
+                        "errors" => [
+                            'token' => ["Token is required!"]
+                        ]
+                    ], 401);
+                } else {
+                    if ($cur['data']['privacy'] == "only-me") {
+                        $authorQuery[] = ["author_id_created_by", "=", $user->author->id];
+                    }
+                }
+            }
+
+
+            $fs = $fields->getAll([
+                "where" => [
+                    ["path_id", "=", $cur['data']['path_id']]
+                ]
+            ]);
+
+            $pagination = [];
+            $sort = !empty($_GET['sort']) ? $_GET['sort'] : [];
+            if (!empty($_GET['page']) && !empty($_GET['limit'])) {
+                $pagination = array_merge($pagination, [
+                    "page" => $_GET['page'],
+                    "limit" => $_GET['limit'],
+                ]);
+            }
+            if (!empty($_GET['page']) && empty($_GET['limit'])) {
+                $pagination = array_merge($pagination, [
+                    "page" => $_GET['page'],
+                    "limit" => 10,
+                ]);
+            }
+            if (empty($_GET['page']) && !empty($_GET['limit'])) {
+                $pagination = array_merge($pagination, [
+                    "page" => 1,
+                    "limit" => $_GET['limit'],
+                ]);
+            }
+
+            $sort = count($sort) > 0 ? ["sort" => $sort] : [];
+            $pagination = count($pagination) > 0 ? ["pagination" => $pagination] : [];
+            $searchArr = [];
+            if (!empty($_GET['search'])) {
+                foreach ($_GET['search'] as $key => $value) {
+                    $searchArr[] = [$key, "LIKE", $value];
+                }
+            }
+            $dataItem = new DataItem;
+            $clause = [
+                "where" => array_merge(
+                    [
+                        ["path_id", "=", $cur['data']['path_id']]
+                    ],
+                    $authorQuery
+                ),
+                "orwhere" => $searchArr
+            ];
+            $data = $dataItem->getJoinFieldAll(
+                $fs,
+                array_merge(
+                    array_merge(
+                        $clause,
+                        $pagination
+                    ),
+                    $sort
+                ),
+                // true
+            );
+
+            $count = $dataItem->getTotalFieldJoin($fs, $clause);
+
+            foreach ($data as $key => $dt) {
+                unset($data[$key]->author_id_created_by);
+                unset($data[$key]->path_id);
+                unset($data[$key]->id);
+            }
+
+            $data = [
+                "data" => $data,
+                "total" => $count->total
+            ];
+            if (!is_array($data)) {
+                return $this->json([
+                    "message" => "not found",
+                    "data" => null
+                ], 404);
+            }
+        } else if ($cur['type'] === "detail") {
+            $authorQuery = [];
+            if ($cur['data']['privacy'] == "only-me" || $cur['data']['privacy'] == "only-logged-in-user") {
+                $user = $this->getUser();
+                if ($user === "expired") {
+                    return $this->json([
+                        "message" => "Something went wrong!",
+                        "data" => null,
+                        "errors" => [
+                            'token' => ["Token is expired!"]
+                        ]
+                    ], 401);
+                } else if ($user === "required") {
+                    return $this->json([
+                        "message" => "Something went wrong!",
+                        "data" => null,
+                        "errors" => [
+                            'token' => ["Token is required!"]
+                        ]
+                    ], 401);
+                } else {
+                    if ($cur['data']['privacy'] == "only-me") {
+                        $authorQuery[] = ["author_id_created_by", "=", $user->author->id];
+                    }
+                }
+            }
+            $dataItem = new DataItem;
+            $fs = $fields->getAll([
+                "where" => [
+                    ["path_id", "=", $cur['data']['path_id']]
+                ]
+            ]);
+
+            $data = $dataItem->getJoinField($fs, [
+                "where" => array_merge([
+                    ["id", "=", $cur['data']['data_item_id']],
+                ], $authorQuery)
+            ]);
+            unset($data->author_id_created_by);
+            unset($data->path_id);
+            unset($data->id);
+        } else {
             return $this->json([
                 "message" => "not found",
                 "data" => null
             ], 404);
-        } else {
-
-            $fields = new FieldForm;
-            $fs = $fields->getAll([
-                "where" => [
-                    ["path_id", "=", $cur['path_id']]
-                ]
-            ]);
-            if (count($cur['params']) > 0) {
-
-                $data = $this->getDetail($cur['path_id'], $cur['params']['slug'], $fs);
-                if (!$data) {
-                    return $this->json([
-                        "message" => "not found",
-                        "data" => null
-                    ], 404);
-                }
-            } else {
-                $pagination = [];
-                $sort = !empty($_GET['sort']) ? $_GET['sort'] : [];
-                if (!empty($_GET['page']) && !empty($_GET['limit'])) {
-                    $pagination = array_merge($pagination, [
-                        "page" => $_GET['page'],
-                        "limit" => $_GET['limit'],
-                    ]);
-                }
-                if (!empty($_GET['page']) && empty($_GET['limit'])) {
-                    $pagination = array_merge($pagination, [
-                        "page" => $_GET['page'],
-                        "limit" => 10,
-                    ]);
-                }
-                if (empty($_GET['page']) && !empty($_GET['limit'])) {
-                    $pagination = array_merge($pagination, [
-                        "page" => 1,
-                        "limit" => $_GET['limit'],
-                    ]);
-                }
-
-                $sort = count($sort) > 0 ? ["sort" => $sort] : [];
-                $pagination = count($pagination) > 0 ? ["pagination" => $pagination] : [];
-                $searchArr = [];
-                if (!empty($_GET['search'])) {
-                    foreach ($_GET['search'] as $key => $value) {
-                        $searchArr[] = [$key, "LIKE", $value];
-                    }
-                }
-                $dataItem = new DataItem;
-                $clause = [
-                    "where" => [
-                        ["path_id", "=", $cur['path_id']]
-                    ],
-                    "orwhere" => $searchArr
-                ];
-                $data = $dataItem->getJoinFieldAll($fs, array_merge(array_merge($clause, $pagination), $sort));
-
-                $count = $dataItem->getTotalFieldJoin($fs, $clause);
-
-                $data = [
-                    "data" => $data,
-                    "total" => $count->total
-                ];
-                if (!is_array($data)) {
-                    return $this->json([
-                        "message" => "not found",
-                        "data" => null
-                    ], 404);
-                }
-            }
-            return $this->json([
-                "message" => "data found",
-                "data" => $data,
-            ]);
         }
+
+        return $this->json([
+            "message" => "data found",
+            "data" => $data,
+        ]);
     }
 
     public function store()
     {
 
         $cur = $this->getSelectedPath($this->path);
-        if ($cur['matched']) {
+
+        $fields = new FieldForm;
+        if ($cur['type'] === "index") {
             $dataItem = $_POST;
 
             $err = [];
@@ -158,11 +238,10 @@ class CustomController extends Controller
             }
 
             $dataItem['author_id_created_by'] = $user->author->id;
-            $dataItem['path_id'] = $cur['path_id'];
+            $dataItem['path_id'] = $cur['data']['path_id'];
             unset($dataItem['field']);
 
             $dataItem['slug'] = preg_replace("/[^a-zA-Z0-9-_\s]/i", "", $dataItem['title']);
-            $dataItem['slug'] = preg_replace("/\s/i", "-", $dataItem['slug']);
             $dataItem['slug'] = preg_replace("/\s/i", "-", $dataItem['slug']);
 
             $lastchar = substr($dataItem['slug'], -1);
@@ -184,7 +263,7 @@ class CustomController extends Controller
             $ff = new FieldForm;
             $fields = $ff->getAll([
                 "where" => [
-                    ["path_id", "=", $cur['path_id']]
+                    ["path_id", "=", $cur['data']['path_id']]
                 ]
             ]);
             if (!empty($_POST['field'])) {
@@ -196,13 +275,13 @@ class CustomController extends Controller
                     $df->insert([
                         "data_item_id" => $id,
                         "field_form_id" => $field->id,
-                        "path_id" => $cur['path_id'],
+                        "path_id" => $cur['data']['path_id'],
                         "name" => $field->name,
                         "value" => $dataField[$field->name]
                     ]);
                 }
             }
-            $data = $this->getDetail($cur['path_id'], $dataItem['slug'], $fields);
+            $data = $this->getDetail($cur['data']['path_id'], $dataItem['slug'], $fields);
             return $this->json([
                 "message" => "data found",
                 "data" => $data,
@@ -219,7 +298,7 @@ class CustomController extends Controller
     {
         parse_str(file_get_contents('php://input'), $_PUT);
         $cur = $this->getSelectedPath($this->path);
-        if ($cur['matched']) {
+        if ($cur['type'] == "detail") {
             $dataItem = $_PUT;
             unset($dataItem['slug']);
             unset($dataItem['field']);
@@ -227,7 +306,7 @@ class CustomController extends Controller
             $dis = new DataItem;
             $di = $dis->get([
                 "where" => [
-                    ["slug", "=", $cur['params']['slug']]
+                    ["id", "=", $cur['data']['data_item_id']]
                 ]
             ]);
 
@@ -270,7 +349,7 @@ class CustomController extends Controller
             $dis->update([
                 "set" => $dataItem,
                 "where" => [
-                    ["slug", "=", $cur['params']['slug']]
+                    ["id", "=", $cur['data']['data_item_id']]
                 ]
             ]);
             if (!empty($_PUT['field'])) {
@@ -280,7 +359,7 @@ class CustomController extends Controller
 
                     $df = $dfs->get([
                         "where" => [
-                            ["path_id", "=", $cur['path_id']],
+                            ["path_id", "=", $cur['data']['path_id']],
                             ["data_item_id", "=", $di->id],
                             ['name', "=", $key]
                         ]
@@ -291,7 +370,7 @@ class CustomController extends Controller
                                 "value" => $value
                             ],
                             "where" => [
-                                ["path_id", "=", $cur['path_id']],
+                                ["path_id", "=", $cur['data']['path_id']],
                                 ["data_item_id", "=", $di->id],
                                 ['name', "=", $key]
                             ]
@@ -302,12 +381,12 @@ class CustomController extends Controller
                         $field = $ff->get([
                             "where" => [
                                 ["name", "=", $key],
-                                ["path_id", "=", $cur['path_id']]
+                                ["path_id", "=", $cur['data']['path_id']]
                             ]
                         ]);
                         if ($ff) {
                             $dfs->insert([
-                                "path_id" => $cur['path_id'],
+                                "path_id" => $cur['data']['path_id'],
                                 "data_item_id" => $di->id,
                                 'name' => $key,
                                 "value" => $value,
@@ -329,82 +408,67 @@ class CustomController extends Controller
     public function delete()
     {
         $cur = $this->getSelectedPath($this->path);
-        if ($cur['matched'] === false) {
+        if ($cur['type'] === "detail") {
+
+            $dataItem = new DataItem;
+            $data = $dataItem->get([
+                "where" => [
+                    ["id", "=", $cur['data']['data_item_id']]
+                ]
+            ]);
+
+            $err = [];
+            $user = $this->getUser();
+
+            if ($user === "expired") {
+                return $this->json([
+                    "message" => "Something went wrong!",
+                    "data" => null,
+                    "errors" => [
+                        'token' => ["Token is expired!"]
+                    ]
+                ], 401);
+            }
+            if ($user === "required") {
+                return $this->json([
+                    "message" => "Something went wrong!",
+                    "data" => null,
+                    "errors" => [
+                        'token' => ["Token is required!"]
+                    ]
+                ], 401);
+            }
+            if ($user->author->id !== $data->author_id_created_by) {
+                $err['token'][] = "Token is invalid!";
+            }
+
+            if (count($err) > 0) {
+                return $this->json([
+                    "message" => "Something went wrong!",
+                    "data" => null,
+                    "errors" => $err
+                ], 400);
+            }
+            $dataField = new DataField;
+            $dataField->delete([
+                "where" => [
+                    ["data_item_id", "=", $cur['data']['data_item_id']]
+                ]
+            ]);
+            $dataItem->delete([
+                "where" => [
+                    ["id", "=", $cur['data']['data_item_id']],
+                ]
+            ]);
+            return $this->json([
+                "message" => "data found",
+                "data" => $data,
+            ]);
+        } else {
             return $this->json([
                 "message" => "not found",
                 "data" => null
             ], 404);
-        } else {
-            if (count($cur['params']) > 0) {
-
-                $dataItem = new DataItem;
-                $data = $dataItem->get([
-                    "where" => [
-                        ["path_id", "=", $cur['path_id']],
-                        ["slug", "=", $cur['params']['slug']]
-                    ]
-                ]);
-                if (!$data) {
-                    return $this->json([
-                        "message" => "not found",
-                        "data" => null
-                    ], 404);
-                }
-
-                $err = [];
-                $user = $this->getUser();
-
-                if ($user === "expired") {
-                    return $this->json([
-                        "message" => "Something went wrong!",
-                        "data" => null,
-                        "errors" => [
-                            'token' => ["Token is expired!"]
-                        ]
-                    ], 401);
-                }
-                if ($user === "required") {
-                    return $this->json([
-                        "message" => "Something went wrong!",
-                        "data" => null,
-                        "errors" => [
-                            'token' => ["Token is required!"]
-                        ]
-                    ], 401);
-                }
-                if ($user->author->id !== $data->author_id_created_by) {
-                    $err['token'][] = "Token is invalid!";
-                }
-
-                if (count($err) > 0) {
-                    return $this->json([
-                        "message" => "Something went wrong!",
-                        "data" => null,
-                        "errors" => $err
-                    ], 400);
-                }
-                $dataField = new DataField;
-                $dataField->delete([
-                    "where" => [
-                        ["data_item_id", "=", $data->id]
-                    ]
-                ]);
-                $dataItem->delete([
-                    "where" => [
-                        ["path_id", "=", $cur['path_id']],
-                        ["slug", "=", $cur['params']['slug']]
-                    ]
-                ]);
-                return $this->json([
-                    "message" => "data found",
-                    "data" => $data,
-                ]);
-            } else {
-                return $this->json([
-                    "message" => "not found",
-                    "data" => null
-                ], 404);
-            }
         }
     }
 }

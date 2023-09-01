@@ -90,7 +90,10 @@ class Model
     public function get($data, $debug = false)
     {
 
-        $where = $this->queryWhereClause(["where" => $data['where']]);
+        $where = $this->queryWhereClause([
+            "where" => $data['where'],
+            "orwhere" => $data['orwhere']
+        ]);
 
 
         $sql = "SELECT * FROM $this->table $where";
@@ -112,7 +115,10 @@ class Model
 
         $limit = $this->queryPagination($data['pagination']);
 
-        $where = $this->queryWhereClause(["where" => $data['where']]);
+        $where = $this->queryWhereClause([
+            "where" => $data['where'],
+            "orwhere" => $data['orwhere']
+        ]);
 
         $sql = "SELECT * FROM $this->table $where $sort $limit";
 
@@ -130,7 +136,10 @@ class Model
     public function getTotal($data)
     {
 
-        $where = $this->queryWhereClause(["where" => $data['where']]);
+        $where = $this->queryWhereClause([
+            "where" => $data['where'],
+            "orwhere" => $data['orwhere']
+        ]);
 
         $query = $this->db->query("SELECT COUNT(*) as total FROM $this->table $where");
         $query->execute();
@@ -197,27 +206,21 @@ class Model
         return $query->execute();
     }
 
-    public function delete($data)
+    public function delete($data, $debug = false)
     {
 
         try {
 
-            $where = "";
-            $whereArr = [];
-
-            foreach ($data['where'] as $item) {
-                if ($item[3] == true) {
-                    $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
-                } else {
-                    $item[2] = "'$item[2]'";
-                    $whereArr[] = " " . implode(" ", $item);
-                }
+            $where = $this->queryWhereClause([
+                "where" => $data['where'],
+                "orwhere" => $data['orwhere']
+            ]);
+            $sql = "DELETE FROM $this->table $where";
+            if ($debug) {
+                print_r($sql);
+                die;
             }
-            if (count($whereArr) > 0) {
-                $where = "WHERE " . implode(" AND ", $whereArr);
-            }
-
-            $query = $this->db->query("DELETE FROM $this->table $where");
+            $query = $this->db->query($sql);
             return $query->execute();
         } catch (Exception $err) {
             throw new Exception($err);
