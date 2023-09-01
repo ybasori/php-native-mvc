@@ -7,7 +7,7 @@ use Firebase\JWT\Key;
 use Firebase\JWT\ExpiredException;
 use UnexpectedValueException;
 
-class AuthorizationCheck extends Middleware
+class SuperAdminCheck extends Middleware
 {
 
     function __construct()
@@ -17,8 +17,18 @@ class AuthorizationCheck extends Middleware
     public function handle($next)
     {
         try {
-            JWT::decode(str_replace("Bearer ", "", $_SERVER["HTTP_AUTHORIZATION"]), new Key($_ENV['JWT_KEY'], 'HS256'));
-            return $next();
+            $code = JWT::decode(str_replace("Bearer ", "", $_SERVER["HTTP_AUTHORIZATION"]), new Key($_ENV['JWT_KEY'], 'HS256'));
+
+            if (!empty($code->author->role) && $code->author->role == "superadmin") {
+                return $next();
+            }
+            return $this->json([
+                "message" => "Something went wrong!",
+                "data" => null,
+                "errors" => [
+                    "token" =>  ["Token Invalid"]
+                ],
+            ], 401);
         } catch (ExpiredException $err) {
             return $this->json([
                 "message" => "Something went wrong!",

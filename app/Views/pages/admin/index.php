@@ -64,6 +64,7 @@
                                     <th>No.</th>
                                     <th>Name</th>
                                     <th>Path</th>
+                                    <th>Privacy</th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
@@ -73,6 +74,7 @@
                                         <td><?= $key + 1 ?>.</td>
                                         <td><?= $dt->name ?></td>
                                         <td>/json/v1/custom<?= $dt->full_path ?></td>
+                                        <td><?= $dt->privacy ?></td>
                                         <td>
                                             <button class="btn btn-success" type="button" onclick="selectedEditId('<?= $dt->id ?>')">Edit</button>
                                             <button class="btn btn-danger" type="button" onclick="selectedId('<?= $dt->id ?>')">Delete</button>
@@ -459,8 +461,11 @@
     }
 
     function onDelete() {
-        fetch(`/admin?id=${selected}`, {
-            method: "delete"
+        fetch(`/json/v1/admin?id=${selected}`, {
+            method: "delete",
+            headers: {
+                "Authorization": `Bearer ${getAuth().token}`
+            }
         }).then(function(res) {
             if (res.status >= 200 && res.status < 300) {
                 selected = null;
@@ -492,9 +497,12 @@
 
         var form = new URLSearchParams(new FormData(e.target));
 
-        fetch(`/admin?id=${editId}`, {
+        fetch(`/json/v1/admin?id=${editId}`, {
             method: "put",
-            body: form
+            body: form,
+            headers: {
+                "Authorization": `Bearer ${getAuth().token}`
+            }
         }).then(function(res) {
             window.location.reload();
         })
@@ -506,9 +514,12 @@
 
         var form = new FormData(e.target);
 
-        fetch("/admin", {
+        fetch("/json/v1/admin", {
             method: "post",
-            body: form
+            body: form,
+            headers: {
+                "Authorization": `Bearer ${getAuth().token}`
+            }
         }).then(function(res) {
             res.json().then(function(data) {
                 if (res.status >= 200 && res.status < 300) {

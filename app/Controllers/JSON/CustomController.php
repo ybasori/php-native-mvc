@@ -207,25 +207,6 @@ class CustomController extends Controller
 
             $err = [];
             $user = $this->getUser();
-            if ($user === "expired") {
-                return $this->json([
-                    "message" => "Something went wrong!",
-                    "data" => null,
-                    "errors" => [
-                        'token' => ["Token is expired!"]
-                    ]
-                ], 401);
-            }
-            if ($user === "required") {
-                return $this->json([
-                    "message" => "Something went wrong!",
-                    "data" => null,
-                    "errors" => [
-                        'token' => ["Token is required!"]
-                    ]
-                ], 401);
-            }
-
             if (empty($dataItem['title'])) {
                 $err['title'][] = "Title is required!";
             }
@@ -313,24 +294,6 @@ class CustomController extends Controller
             $err = [];
             $user = $this->getUser();
 
-            if ($user === "expired") {
-                return $this->json([
-                    "message" => "Something went wrong!",
-                    "data" => null,
-                    "errors" => [
-                        'token' => ["Token is expired!"]
-                    ]
-                ], 401);
-            }
-            if ($user === "required") {
-                return $this->json([
-                    "message" => "Something went wrong!",
-                    "data" => null,
-                    "errors" => [
-                        'token' => ["Token is required!"]
-                    ]
-                ], 401);
-            }
             if ($user->author->id !== $di->author_id_created_by) {
                 $err['token'][] = "Token is invalid!";
             }
@@ -419,25 +382,6 @@ class CustomController extends Controller
 
             $err = [];
             $user = $this->getUser();
-
-            if ($user === "expired") {
-                return $this->json([
-                    "message" => "Something went wrong!",
-                    "data" => null,
-                    "errors" => [
-                        'token' => ["Token is expired!"]
-                    ]
-                ], 401);
-            }
-            if ($user === "required") {
-                return $this->json([
-                    "message" => "Something went wrong!",
-                    "data" => null,
-                    "errors" => [
-                        'token' => ["Token is required!"]
-                    ]
-                ], 401);
-            }
             if ($user->author->id !== $data->author_id_created_by) {
                 $err['token'][] = "Token is invalid!";
             }

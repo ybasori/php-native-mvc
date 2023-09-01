@@ -45,7 +45,10 @@ class AuthController extends Controller
                         ["user_id", "=", $usr->id]
                     ]
                 ]);
-                $mine = (object) array_merge((array) $mine, ["email" => $usr->email]);
+                $mine = (object) array_merge((array) $mine, [
+                    "email" => $usr->email,
+                    "role" => $usr->role
+                ]);
                 $iat = time();
                 $exp = $iat + (1 * 60 * 60);
                 $key = $_ENV['JWT_KEY'];
