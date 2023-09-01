@@ -10,7 +10,7 @@ use App\Controllers\Controller;
 
 class CustomController extends Controller
 {
-    private $path = "/json/custom";
+    private $path = "/json/v1/custom";
     private function getDetail($path_id, $slug, $fields)
     {
 

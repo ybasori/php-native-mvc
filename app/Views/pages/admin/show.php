@@ -8,7 +8,7 @@
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <input id="path" class="form-control" value="/json/custom<?= $path->realpath ?>" readonly />
+            <input id="path" class="form-control" value="/json/v1/custom<?= $path->realpath ?>" readonly />
         </div>
     </div>
     <div class="row" id="data-array" style="display:none">
@@ -414,7 +414,7 @@
     function onGetNewPath(querySearch) {
 
         var path = document.getElementById("path").value;
-        var actualpath = `${path}`.substring(12);
+        var actualpath = `${path}`.substring(15);
 
         var querySearchExp = expandJSON(querySearch);
 
@@ -463,7 +463,7 @@
 
     function onGetData() {
         var path = document.getElementById("path").value;
-        var actualpath = `${path}`.substring(12);
+        var actualpath = `${path}`.substring(15);
 
         var querySearch = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
 
@@ -546,7 +546,7 @@
     }
 
     function onDelete() {
-        fetch(`/json/custom${deleteId}`, {
+        fetch(`/json/v1/custom${deleteId}`, {
             method: "delete",
             headers: {
                 "Authorization": `Bearer ${getAuth().token}`

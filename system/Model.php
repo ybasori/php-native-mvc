@@ -87,12 +87,19 @@ class Model
         return "";
     }
 
-    public function get($data)
+    public function get($data, $debug = false)
     {
 
-        $where = $this->queryWhereClause($data['where']);
+        $where = $this->queryWhereClause(["where" => $data['where']]);
 
-        $query = $this->db->query("SELECT * FROM $this->table $where");
+
+        $sql = "SELECT * FROM $this->table $where";
+
+        if ($debug) {
+            print_r($data);
+            die;
+        }
+        $query = $this->db->query($sql);
         $query->execute();
 
         return $query->fetch();
@@ -105,7 +112,7 @@ class Model
 
         $limit = $this->queryPagination($data['pagination']);
 
-        $where = $this->queryWhereClause($data['where']);
+        $where = $this->queryWhereClause(["where" => $data['where']]);
 
         $sql = "SELECT * FROM $this->table $where $sort $limit";
 
@@ -123,7 +130,7 @@ class Model
     public function getTotal($data)
     {
 
-        $where = $this->queryWhereClause($data['where']);
+        $where = $this->queryWhereClause(["where" => $data['where']]);
 
         $query = $this->db->query("SELECT COUNT(*) as total FROM $this->table $where");
         $query->execute();

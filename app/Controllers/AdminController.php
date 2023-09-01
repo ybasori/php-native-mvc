@@ -52,7 +52,7 @@ class AdminController extends Controller
             ]);
             $data = $path->get([
                 "where" => [
-                    ["full_path", "=", $cur['path']]
+                    ["id", "=", $cur['path_id']]
                 ]
             ]);
             if ($data) {

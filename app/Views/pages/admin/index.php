@@ -28,17 +28,17 @@
                                 <tr>
                                     <td>1.</td>
                                     <td>Login</td>
-                                    <td>/json/auth/login</td>
+                                    <td>/json/v1/auth/login</td>
                                 </tr>
                                 <tr>
                                     <td>2.</td>
                                     <td>Register</td>
-                                    <td>/json/auth/register</td>
+                                    <td>/json/v1/auth/register</td>
                                 </tr>
                                 <tr>
                                     <td>3.</td>
                                     <td>Author</td>
-                                    <td>/json/author/[username]</td>
+                                    <td>/json/v1/author/[username]</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -72,7 +72,7 @@
                                     <tr>
                                         <td><?= $key + 1 ?>.</td>
                                         <td><?= $dt->name ?></td>
-                                        <td>/json/custom<?= $dt->full_path ?></td>
+                                        <td>/json/v1/custom<?= $dt->full_path ?></td>
                                         <td>
                                             <button class="btn btn-success" type="button" onclick="selectedEditId('<?= $dt->id ?>')">Edit</button>
                                             <button class="btn btn-danger" type="button" onclick="selectedId('<?= $dt->id ?>')">Delete</button>
@@ -505,7 +505,7 @@
         editId = value;
         openModal("editModal").then(() => {
             if (allPath.length === 0) {
-                fetch("/json/custom", {
+                fetch("/json/v1/custom", {
                     method: "get",
                 }).then(function(res) {
                     return res.json()
@@ -533,7 +533,7 @@
     function onOpenAddModal() {
         openModal("addModal").then(() => {
             if (allPath.length === 0) {
-                fetch("/json/custom", {
+                fetch("/json/v1/custom", {
                     method: "get",
                 }).then(function(res) {
                     return res.json()

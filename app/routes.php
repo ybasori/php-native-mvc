@@ -27,15 +27,15 @@ $router->put("/admin", [AdminController::class, 'update']);
 $router->delete("/admin", [AdminController::class, 'delete']);
 
 // default path
-$router->post("/json/auth/register", [AuthController::class, 'register']);
-$router->post("/json/auth/login", [AuthController::class, 'login']);
-$router->get("/json/author/:username", [DefaultController::class, 'author']);
+$router->post("/json/v1/auth/register", [AuthController::class, 'register']);
+$router->post("/json/v1/auth/login", [AuthController::class, 'login']);
+$router->get("/json/v1/author/:username", [DefaultController::class, 'author']);
 
 // custom path
-$router->get("/json/custom", [CustomController::class, 'index']);
-$router->get("/json/custom/:any", [CustomController::class, 'show']);
-$router->delete("/json/custom/:any", [CustomController::class, 'delete']);
-$router->post("/json/custom/:any", [CustomController::class, 'store']);
-$router->put("/json/custom/:any", [CustomController::class, 'update']);
+$router->get("/json/v1/custom", [CustomController::class, 'index']);
+$router->get("/json/v1/custom/:any", [CustomController::class, 'show']);
+$router->delete("/json/v1/custom/:any", [CustomController::class, 'delete']);
+$router->post("/json/v1/custom/:any", [CustomController::class, 'store']);
+$router->put("/json/v1/custom/:any", [CustomController::class, 'update']);
 
 $router->run();

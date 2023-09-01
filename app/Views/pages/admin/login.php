@@ -102,7 +102,7 @@
 
         var form = new FormData(e.target);
 
-        fetch("/json/auth/login", {
+        fetch("/json/v1/auth/login", {
             method: "post",
             body: form
         }).then(function(res) {
@@ -158,7 +158,7 @@
         if (e.target[name = 'retype_password'].value === e.target[name = 'password'].value) {
             var form = new FormData(e.target);
 
-            fetch("/json/auth/register", {
+            fetch("/json/v1/auth/register", {
                 method: "post",
                 body: form
             }).then(function(res) {

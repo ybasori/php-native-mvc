@@ -15,6 +15,7 @@ class Controller extends Response
 
     private function matchingPath($requestPath, $prefix,  $fullpath, $affix)
     {
+
         $explodedFullpath = explode("/", $prefix . $fullpath . $affix);
         if ($explodedFullpath[0] === "") {
             unset($explodedFullpath[0]);
@@ -29,6 +30,8 @@ class Controller extends Response
         if ($explodedReqPath[count($explodedReqPath) - 1] === "") {
             unset($explodedReqPath[count($explodedReqPath) - 1]);
         }
+
+
         if (count($explodedFullpath) == count($explodedReqPath)) {
             $correct = 0;
             $newParams = [];
