@@ -15,7 +15,7 @@ class AdminController extends Controller
         $data = $path->getAll([]);
 
         $this->view("layouts/base-layout/header");
-        if ($_GET['page'] === "login") {
+        if ($_GET['p'] === "login") {
             $this->view("pages/admin/login");
         } else {
             $this->view("pages/admin/index", ["data" => $data]);

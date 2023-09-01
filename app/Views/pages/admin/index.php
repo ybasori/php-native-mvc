@@ -135,30 +135,31 @@
                             <input type="text" class="form-control input-path" placeholder="path" readonly>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label for="" class="col-sm-2 control-label">Privacy</label>
-                        <div class="col-sm-10">
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="privacy" value="none" checked>
-                                    None
-                                </label>
-                            </div>
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="privacy" value="only-logged-in-user">
-                                    Only logged in user
-                                </label>
-                            </div>
-                            <div class="radio">
-                                <label>
-                                    <input type="radio" name="privacy" value="only-me">
-                                    Only user him or her self
-                                </label>
+                    <div id="if-type-form" style="display:none">
+
+                        <div class="form-group">
+                            <label for="" class="col-sm-2 control-label">Privacy</label>
+                            <div class="col-sm-10">
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="privacy" value="none" checked>
+                                        None
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="privacy" value="only-logged-in-user">
+                                        Only logged in user
+                                    </label>
+                                </div>
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="privacy" value="only-me">
+                                        Only user him or her self
+                                    </label>
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div id="if-type-form" style="display:none">
                         <div class="panel panel-default">
                             <div class="panel-heading" role="tab">
                                 <h4 class="panel-title">
@@ -241,6 +242,23 @@
                             <input type="text" class="form-control" placeholder="Name" name="name" autocomplete="off">
                         </div>
                     </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">Parent</label>
+                        <div class="col-sm-10">
+                            <select type="text" class="form-control" name="parent_id">
+                                <option value="" selected hidden>(Optional)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="" class="col-sm-2 control-label">Path</label>
+                        <div class="col-sm-10">
+                            <input type="text" class="form-control input-path" placeholder="path" readonly>
+                        </div>
+                    </div>
+
+
+
 
                     <div class="form-group">
                         <div class="col-sm-offset-2 col-sm-10">
@@ -416,11 +434,16 @@
 
     function arrToModalById(arr, id, value = null) {
         var data = null;
+
+        document.getElementById(id).querySelector("select[name='parent_id']").innerHTML = "";
+
+        var opt = document.createElement("option");
+        opt.text = "None";
+        opt.value = "";
+        document.getElementById(id).querySelector("select[name='parent_id']").appendChild(opt)
+
         allPath = arr;
         arr
-            .filter(function(item) {
-                return item.type == "path"
-            })
             .forEach(function(item) {
                 var opt = document.createElement("option");
                 opt.text = item.full_path
@@ -428,15 +451,14 @@
                 if (value !== null && item.id === Number(value)) {
                     data = item;
                 }
-
-                if (id != "editModal") {
-                    document.getElementById(id).querySelector("select[name='parent']").appendChild(opt)
-                }
+                document.getElementById(id).querySelector("select[name='parent_id']").appendChild(opt)
             })
 
         if (data !== null && id === "editModal") {
             var modalEl = document.getElementById(id)
             modalEl.querySelector("input[name=name]").value = data.name;
+            modalEl.querySelector("select[name=parent_id]").value = data.parent_id ? data.parent_id : "";
+            modalEl.querySelector(".input-path").value = data.path;
 
 
         }
@@ -504,7 +526,9 @@
                 "Authorization": `Bearer ${getAuth().token}`
             }
         }).then(function(res) {
-            window.location.reload();
+            if (res.status >= 200 && res.status < 300) {
+                window.location.reload();
+            }
         })
     }
 

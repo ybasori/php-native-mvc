@@ -26,26 +26,6 @@ class AdminController extends Controller
 
     public function store()
     {
-        $user = $this->getUser();
-        if ($user === "expired") {
-            return $this->json([
-                "message" => "Something went wrong!",
-                "data" => null,
-                "errors" => [
-                    'token' => ["Token is expired!"]
-                ]
-            ], 401);
-        }
-        if ($user === "required") {
-            return $this->json([
-                "message" => "Something went wrong!",
-                "data" => null,
-                "errors" => [
-                    'token' => ["Token is required!"]
-                ]
-            ], 401);
-        }
-
         $path = new Path;
         $dataPath = $_POST;
         unset($dataPath['field']);
@@ -147,28 +127,10 @@ class AdminController extends Controller
 
         parse_str(file_get_contents('php://input'), $_PUT);
 
-        $user = $this->getUser();
-        if ($user === "expired") {
-            return $this->json([
-                "message" => "Something went wrong!",
-                "data" => null,
-                "errors" => [
-                    'token' => ["Token is expired!"]
-                ]
-            ], 401);
-        }
-        if ($user === "required") {
-            return $this->json([
-                "message" => "Something went wrong!",
-                "data" => null,
-                "errors" => [
-                    'token' => ["Token is required!"]
-                ]
-            ], 401);
-        }
-
+        $path = new Path;
         $err = [];
-        if (empty($_PUT['name'])) {
+        $dataUpdate = $_PUT;
+        if (empty($dataUpdate['name'])) {
             $err['name'][] = "Name is required!";
         }
         if (count($err) > 0) {
@@ -179,8 +141,27 @@ class AdminController extends Controller
             ], 400);
         }
         $path = new Path;
+        $dataPath = $path->get([
+            "where" => [
+                ["id", "=", $_GET['id']]
+            ]
+        ]);
+        if (!empty($dataUpdate['parent_id'])) {
+            $dataParent = $path->get([
+                "where" => [
+                    ["id", "=", $dataUpdate['parent_id']]
+                ]
+            ]);
+            $dataUpdate['full_path'][] = substr($dataParent->full_path, 1);
+        }
+        $dataUpdate['full_path'][] = $dataPath->path;
+        $dataUpdate['full_path'] = "/" . implode("/", $dataUpdate['full_path']);
         $path->update([
-            "set" => ["name" => $_PUT['name']],
+            "set" => [
+                "name" => $dataUpdate['name'],
+                "parent_id" => $dataUpdate['parent_id'],
+                "full_path" => $dataUpdate['full_path']
+            ],
             "where" => [
                 ["id", "=", $_GET['id']]
             ]
@@ -190,27 +171,6 @@ class AdminController extends Controller
 
     public function delete()
     {
-
-        $user = $this->getUser();
-        if ($user === "expired") {
-            return $this->json([
-                "message" => "Something went wrong!",
-                "data" => null,
-                "errors" => [
-                    'token' => ["Token is expired!"]
-                ]
-            ], 401);
-        }
-        if ($user === "required") {
-            return $this->json([
-                "message" => "Something went wrong!",
-                "data" => null,
-                "errors" => [
-                    'token' => ["Token is required!"]
-                ]
-            ], 401);
-        }
-
 
         $path = new Path;
         $allPathIds = [$_GET['id']];

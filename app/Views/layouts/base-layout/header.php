@@ -109,11 +109,11 @@
         }
 
         if (!getAuth()) {
-            if (window.location.pathname + window.location.search !== "/admin?page=login") {
-                window.location.href = "/admin?page=login"
+            if (window.location.pathname + window.location.search !== "/admin?p=login") {
+                window.location.href = "/admin?p=login"
             }
         } else {
-            if (window.location.pathname + window.location.search === "/admin?page=login") {
+            if (window.location.pathname + window.location.search === "/admin?p=login") {
                 window.location.href = "/admin"
             }
         }
