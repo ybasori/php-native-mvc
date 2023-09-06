@@ -154,6 +154,11 @@
                     </div>
                 </div>
             </div>
+            <div class="row" id="relogin" style="display:none">
+                <div class="col-md-12">
+                    <button class="btn btn-default" type="button" onclick="removeAuth()">re-Login</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -780,19 +785,17 @@
             }
         }).then(function(res) {
             if (res.status >= 200 && res.status < 300) {
-                return res.json()
-            }
-        }).then(function(res) {
-            total = res.data.total;
-            var no = 1;
-            if (limit != "all") {
-                no = (page * limit) - (limit - 1);
-            }
-            var elAllPath = document.getElementById("all-path");
-            var tbody = elAllPath.querySelector("tbody");
+                return res.json().then(function(res) {
+                    total = res.data.total;
+                    var no = 1;
+                    if (limit != "all") {
+                        no = (page * limit) - (limit - 1);
+                    }
+                    var elAllPath = document.getElementById("all-path");
+                    var tbody = elAllPath.querySelector("tbody");
 
-            res.data.data.forEach(function(item) {
-                tbody.innerHTML = tbody.innerHTML + `
+                    res.data.data.forEach(function(item) {
+                        tbody.innerHTML = tbody.innerHTML + `
                 <tr>
                     <td>${no}</td>
                     <td>${item.name}</td>
@@ -804,8 +807,13 @@
                         ${item.type==="form"?`<a class="btn btn-default" href="/admin/try${item.full_path}" role="button">Open</a>`:""}
                     </td>
                 </tr>`;
-                no++;
-            })
+                        no++;
+                    })
+                });
+            }
+            if (res.status == 401) {
+                document.getElementById("relogin").style.display = "block"
+            }
         })
     }
 

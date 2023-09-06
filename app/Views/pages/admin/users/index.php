@@ -123,7 +123,7 @@
     </div>
     <div class="row" id="relogin" style="display:none">
         <div class="col-md-12">
-            <button class="btn btn-default" type="button" onclick="removeAuth()">Login</button>
+            <button class="btn btn-default" type="button" onclick="removeAuth()">re-Login</button>
         </div>
     </div>
 </div>

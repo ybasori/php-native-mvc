@@ -7,6 +7,7 @@ use App\Middlewares\ExampleFailMiddleware;
 use App\Middlewares\ExampleSuccessMiddleware;
 use App\Middlewares\AuthorizationCheck;
 use App\Middlewares\SuperAdminCheck;
+use App\Middlewares\AdminCheck;
 
 use App\Controllers\HomeController;
 use App\Controllers\Admin\AdminController;
@@ -34,12 +35,12 @@ $router->get("/admin/try/:any", [AdminController::class, 'show']);
 // default path
 $router->get("/json/v1/admin/users", [
     AuthorizationCheck::class,
-    SuperAdminCheck::class
+    AdminCheck::class
 ], [JSONUserController::class, 'index']);
 
 $router->get("/json/v1/admin/users/:id", [
     AuthorizationCheck::class,
-    SuperAdminCheck::class
+    AdminCheck::class
 ], [JSONUserController::class, 'show']);
 
 $router->put("/json/v1/admin/users/:id", [
@@ -68,9 +69,12 @@ $router->delete("/json/v1/admin/path/:id", [
 $router->post("/json/v1/auth/register", [AuthController::class, 'register']);
 $router->post("/json/v1/auth/login", [AuthController::class, 'login']);
 $router->get("/json/v1/author/:username", [DefaultController::class, 'author']);
+$router->get("/json/v1/custom", [
+    AuthorizationCheck::class,
+    AdminCheck::class
+], [CustomController::class, 'index']);
 
 // custom path
-$router->get("/json/v1/custom", [CustomController::class, 'index']);
 $router->get("/json/v1/custom/:any", [CustomController::class, 'show']);
 
 $router->delete("/json/v1/custom/:any", [
