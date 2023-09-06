@@ -109,13 +109,21 @@
             res.json().then(function(data) {
 
                 if (res.status >= 200 && res.status < 300) {
-                    setAuth(data.data);
+                    if (data.data.role === "superadmin" || data.data.role === "admin") {
+                        setAuth(data.data);
+                    }
                     document.getElementById("login").appendChild(elAlert);
                     elAlert.innerHTML = "Success"
+                    var getArr = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
                     setTimeout(function() {
                         elAlert.innerHTML = "";
                         elAlert.remove();
-                        window.location.reload()
+
+                        if (getArr.redirect) {
+                            window.location.href = getArr.redirect
+                        } else {
+                            window.location.reload()
+                        }
                     }, 1000)
                 } else if (res.status >= 400 && res.status < 500) {
                     elAlertDgr.innerHTML = "";

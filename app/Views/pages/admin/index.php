@@ -1,13 +1,6 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
-            <div class="pull-right">
-                <button class="btn btn-default" type="button" onclick="removeAuth()">Logout</button>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
             <div class="panel panel-default">
                 <div class="panel-heading">
                     <h1 class="panel-title">
@@ -22,6 +15,7 @@
                                     <th>No.</th>
                                     <th>Name</th>
                                     <th>Path</th>
+                                    <th>Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -29,16 +23,27 @@
                                     <td>1.</td>
                                     <td>Login</td>
                                     <td>/json/v1/auth/login</td>
+                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td>2.</td>
                                     <td>Register</td>
                                     <td>/json/v1/auth/register</td>
+                                    <td></td>
                                 </tr>
                                 <tr>
-                                    <td>3.</td>
+                                    <td>4.</td>
+                                    <td>Users</td>
+                                    <td>/json/v1/admin/users</td>
+                                    <td>
+                                        <a class="btn btn-default" href="/admin/users">Open</a>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>5.</td>
                                     <td>Author</td>
                                     <td>/json/v1/author/[username]</td>
+                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -57,33 +62,93 @@
                             </div>
                         </div>
                     </div>
-                    <div class="table-responsive">
+                    <div class="row">
+                        <div class="col-sm-2">
+                            <select id="page-limit" class="form-control" onchange="onChangePageLimit(event.target.value)">
+                                <option value="all" <?= empty($_GET['limit']) ? "selected" : "" ?>>All</option>
+                                <option value="5" <?= !empty($_GET['limit']) && $_GET['limit'] == "5" ? "selected" : "" ?>>5</option>
+                                <option value="10" <?= !empty($_GET['limit']) && $_GET['limit'] == "10" ? "selected" : "" ?>>10</option>
+                                <option value="15" <?= !empty($_GET['limit']) && $_GET['limit'] == "15" ? "selected" : "" ?>>15</option>
+                                <option value="20" <?= !empty($_GET['limit']) && $_GET['limit'] == "20" ? "selected" : "" ?>>20</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-10">
+                            <?php if (!empty($_GET['limit'])) : ?>
+                                <button class="btn btn-default" type="button" onclick="onChangePage(<?= !empty($_GET['page']) ? $_GET['page'] - 1 : 0 ?>)">Prev</button>
+                                <button class="btn btn-default" type="button" onclick="onChangePage(<?= !empty($_GET['page']) ? $_GET['page'] + 1 : 2 ?>)">Next</button>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    <div id="all-path" class="table-responsive">
                         <table class="table table-hover">
                             <thead>
                                 <tr>
                                     <th>No.</th>
-                                    <th>Name</th>
-                                    <th>Path</th>
-                                    <th>Privacy</th>
+                                    <th>
+                                        <div class="pull-left">Name</div>
+                                        <div class="pull-right">
+                                            <button class="btn btn-sm btn-default <?= $_GET['sort']['name'] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('name','asc')">
+                                                <i class="glyphicon glyphicon-chevron-up"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-default <?= $_GET['sort']['name'] == "desc" ? "active" : "" ?>" type="button" onclick="onChangeSort('name','desc')">
+                                                <i class="glyphicon glyphicon-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="pull-left">Path
+                                        </div>
+                                        <div class="pull-right">
+                                            <button class="btn btn-sm btn-default <?= $_GET['sort']['full_path'] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('full_path','asc')">
+                                                <i class="glyphicon glyphicon-chevron-up"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-default <?= $_GET['sort']['full_path'] == "desc" ? "active" : "" ?>" type="button" onclick="onChangeSort('full_path','desc')">
+                                                <i class="glyphicon glyphicon-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </th>
+                                    <th>
+                                        <div class="pull-left">Privacy
+                                        </div>
+                                        <div class="pull-right">
+                                            <button class="btn btn-sm btn-default <?= $_GET['sort']['privacy'] == "asc" ? "active" : "" ?>" type="button" onclick="onChangeSort('privacy','asc')">
+                                                <i class="glyphicon glyphicon-chevron-up"></i>
+                                            </button>
+                                            <button class="btn btn-sm btn-default <?= $_GET['sort']['privacy'] == "desc" ? "active" : "" ?>" type="button" onclick="onChangeSort('privacy','desc')">
+                                                <i class="glyphicon glyphicon-chevron-down"></i>
+                                            </button>
+                                        </div>
+                                    </th>
                                     <th>Actions</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <?php foreach ($data as $key => $dt) : ?>
-                                    <tr>
-                                        <td><?= $key + 1 ?>.</td>
-                                        <td><?= $dt->name ?></td>
-                                        <td>/json/v1/custom<?= $dt->full_path ?></td>
-                                        <td><?= $dt->privacy ?></td>
-                                        <td>
-                                            <button class="btn btn-success" type="button" onclick="selectedEditId('<?= $dt->id ?>')">Edit</button>
-                                            <button class="btn btn-danger" type="button" onclick="selectedId('<?= $dt->id ?>')">Delete</button>
-                                            <?php if ($dt->type == "form") : ?>
-                                                <a class="btn btn-default" href="/admin<?= $dt->full_path ?>" role="button">Open</a>
-                                            <?php endif; ?>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
+
+                                <tr>
+                                    <td></td>
+                                    <td>
+                                        <form class="form-inline" onsubmit="onChangeSearch('name', event)">
+                                            <div class="form-group">
+                                                <input name="name" type="text" class="form-control" placeholder="Search by name" value="<?= preg_replace("/%/i", "",  $_GET['search']['name']) ?>">
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form class="form-inline" onsubmit="onChangeSearch('full_path', event)">
+                                            <div class="form-group">
+                                                <input name="full_path" type="text" class="form-control" placeholder="Search by path" value="<?= preg_replace("/%/i", "",  $_GET['search']['full_path']) ?>">
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td>
+                                        <form class="form-inline" onsubmit="onChangeSearch('privacy', event)">
+                                            <div class="form-group">
+                                                <input name="privacy" type="text" class="form-control" placeholder="Search by privacy" value="<?= preg_replace("/%/i", "",  $_GET['search']['privacy']) ?>">
+                                            </div>
+                                        </form>
+                                    </td>
+                                    <td></td>
+                                </tr>
                             </tbody>
                         </table>
                     </div>
@@ -295,6 +360,12 @@
 </div>
 
 <script>
+    var total = 0;
+    var limit = <?= !empty($_GET['limit']) ? $_GET['limit'] : "'all'" ?>;
+    var page = <?= !empty($_GET['page']) ? $_GET['page'] : 1 ?>;
+    var sort = <?= !empty($_GET['sort']) ? json_encode((object) $_GET['sort']) : "{}" ?>;
+    var search = <?= !empty($_GET['search']) ? json_encode((object) $_GET['search']) : "{}" ?>;
+
     var allPath = [];
     var selected = null;
     var pathType = null;
@@ -424,7 +495,7 @@
             document.getElementById(id).querySelector("#if-type-form").style.display = "none"
         }
 
-        alteringPath(document.querySelector("input[name=name]").value, id);
+        alteringPath(document.getElementById("addModal").querySelector("input[name=name]").value, id);
     }
 
     function selectedId(value) {
@@ -474,7 +545,7 @@
                 }).then(function(res) {
                     return res.json()
                 }).then(function(res) {
-                    arrToModalById(res.data, "editModal", value)
+                    arrToModalById(res.data.data, "editModal", value)
                 })
             } else {
                 arrToModalById(allPath, "editModal", value)
@@ -483,7 +554,7 @@
     }
 
     function onDelete() {
-        fetch(`/json/v1/admin?id=${selected}`, {
+        fetch(`/json/v1/admin/path/${selected}`, {
             method: "delete",
             headers: {
                 "Authorization": `Bearer ${getAuth().token}`
@@ -505,7 +576,7 @@
                 }).then(function(res) {
                     return res.json()
                 }).then(function(res) {
-                    arrToModalById(res.data, "addModal")
+                    arrToModalById(res.data.data, "addModal")
                 })
             } else {
                 arrToModalById(allPath, "addModal")
@@ -519,7 +590,7 @@
 
         var form = new URLSearchParams(new FormData(e.target));
 
-        fetch(`/json/v1/admin?id=${editId}`, {
+        fetch(`/json/v1/admin/path/${editId}`, {
             method: "put",
             body: form,
             headers: {
@@ -538,7 +609,7 @@
 
         var form = new FormData(e.target);
 
-        fetch("/json/v1/admin", {
+        fetch("/json/v1/admin/path", {
             method: "post",
             body: form,
             headers: {
@@ -579,4 +650,164 @@
             })
         })
     }
+
+    function onGetNewPath(querySearch) {
+
+        var querySearchExp = expandJSON(querySearch);
+
+        var querySearchArr = []
+        querySearchExp.forEach(function(item) {
+            querySearchArr = [...querySearchArr, `${item.label}=${item.value}`]
+        })
+
+        var querySearchStr = ""
+
+        if (querySearchArr.length > 0) {
+            querySearchStr = `?${querySearchArr.join("&")}`
+        }
+
+        window.location.href = `/admin${querySearchStr}`;
+    }
+
+    function onChangePageLimit(value) {
+        var getArr = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
+        getArr = {
+            ...getArr,
+            limit: value
+        };
+        if (getArr.limit == "all") {
+            delete getArr.limit;
+            delete getArr.page;
+        }
+
+        onGetNewPath(getArr)
+    }
+
+    function onChangePage(value) {
+        var getArr = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
+        getArr = {
+            ...getArr,
+            page: value
+        };
+        if (getArr.page == 1) {
+            delete getArr.page;
+        }
+
+        if (value > 0 && value <= Math.ceil(total / getArr.limit)) {
+            onGetNewPath(getArr)
+        }
+    }
+
+    function onChangeSort(name, type) {
+        var getArr = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
+
+        var sIndex = Object.keys(sort).findIndex(function(item) {
+            return item === name
+        })
+
+        if (sIndex >= 0 && sort[name] == type) {
+            delete sort[name];
+        } else {
+            sort = {
+                ...sort,
+                [name]: type
+            }
+        }
+        getArr = {
+            ...getArr,
+            sort
+        };
+        onGetNewPath(getArr)
+
+    }
+
+    function onChangeSearch(name, e) {
+        e.preventDefault();
+        var getArr = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
+        if (e.target[name = name].value == "") {
+            delete search[name];
+        } else {
+            search = {
+                ...search,
+                [name]: `%${e.target[name = name].value}%`
+            }
+        }
+
+        Object.keys(search).forEach(function(key) {
+            search[key] = encodeURI(search[key]);
+        })
+        getArr = {
+            ...getArr,
+            search
+        };
+        onGetNewPath(getArr)
+    }
+
+
+    function onGetData() {
+        Object.keys(search).forEach(function(key) {
+            search[key] = encodeURI(search[key]);
+        })
+        var querySearch = {
+            search,
+            sort,
+            limit,
+            page
+        }
+
+        if (querySearch.limit == "all") {
+            delete querySearch.limit;
+            delete querySearch.page;
+        }
+
+        var querySearchExp = expandJSON(querySearch);
+
+        var querySearchArr = []
+        querySearchExp.forEach(function(item) {
+            querySearchArr = [...querySearchArr, `${item.label}=${item.value}`]
+        })
+
+        var querySearchStr = ""
+
+        if (querySearchArr.length > 0) {
+            querySearchStr = `?${querySearchArr.join("&")}`
+        }
+
+        fetch(`/json/v1/custom${querySearchStr}`, {
+            method: "get",
+            headers: {
+                "Authorization": `Bearer ${getAuth().token}`
+            }
+        }).then(function(res) {
+            if (res.status >= 200 && res.status < 300) {
+                return res.json()
+            }
+        }).then(function(res) {
+            total = res.data.total;
+            var no = 1;
+            if (limit != "all") {
+                no = (page * limit) - (limit - 1);
+            }
+            var elAllPath = document.getElementById("all-path");
+            var tbody = elAllPath.querySelector("tbody");
+
+            res.data.data.forEach(function(item) {
+                tbody.innerHTML = tbody.innerHTML + `
+                <tr>
+                    <td>${no}</td>
+                    <td>${item.name}</td>
+                    <td>/json/v1/custom${item.full_path}</td>
+                    <td>${item.privacy}</td>
+                    <td>
+                        <button class="btn btn-success" type="button" onclick="selectedEditId('${item.id}')">Edit</button>
+                        <button class="btn btn-danger" type="button" onclick="selectedId('${item.id}')">Delete</button>
+                        ${item.type==="form"?`<a class="btn btn-default" href="/admin/try${item.full_path}" role="button">Open</a>`:""}
+                    </td>
+                </tr>`;
+                no++;
+            })
+        })
+    }
+
+    onGetData()
 </script>

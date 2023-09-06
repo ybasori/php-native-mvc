@@ -40,6 +40,12 @@ class DataItem extends Model
 
         $limit = $this->queryPagination($data['pagination']);
 
+        if (empty($data['where'])) {
+            $data['where'] = [];
+        }
+        if (empty($data['orwhere'])) {
+            $data['orwhere'] = [];
+        }
         $where = $this->queryWhereClause([
             "where" => $data['where'],
             "orwhere" => $data['orwhere']
@@ -76,6 +82,12 @@ class DataItem extends Model
     {
 
 
+        if (empty($data['where'])) {
+            $data['where'] = [];
+        }
+        if (empty($data['orwhere'])) {
+            $data['orwhere'] = [];
+        }
         $where = $this->queryWhereClause([
             "where" => $data['where'],
             "orwhere" => $data['orwhere']
@@ -110,6 +122,12 @@ class DataItem extends Model
     function getTotalFieldJoin($fields, $data)
     {
 
+        if (empty($data['where'])) {
+            $data['where'] = [];
+        }
+        if (empty($data['orwhere'])) {
+            $data['orwhere'] = [];
+        }
         $where = $this->queryWhereClause([
             "where" => $data['where'],
             "orwhere" => $data['orwhere']

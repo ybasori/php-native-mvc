@@ -122,7 +122,7 @@ class AuthController extends Controller
                 $err['username'][] = "Username already registered";
             }
 
-            if (preg_match("/[^a-zA-Z0-9._\s]/i", $dataReg['username'])) {
+            if (preg_match("/[^a-zA-Z0-9._\s]/i", $dataAuthor['username']) || preg_match("/\s/i", $dataAuthor['username'])) {
                 $err['username'][] = "Only use alphanumeric, uppercase, lowercase, dot, and underscore";
             }
         }

@@ -3,8 +3,7 @@
 namespace App\Models;
 
 use System\Model;
-
-// use App\Systems\Database as DB;
+use System\Database as DB;
 // use Ramsey\Uuid\Uuid;
 // use Firebase\JWT\JWT;
 // use Firebase\JWT\Key;
@@ -13,12 +12,115 @@ class User extends Model
 {
 
     public $table = "users";
-    //     private $db;
+    private $db;
 
     function __construct()
     {
         parent::__construct();
-        // $this->db = new DB;
+        $this->db = new DB;
+    }
+
+    function getJoinAuthorAll($data, $debug = false)
+    {
+        $sort = $this->querySort($data['sort']);
+
+        $limit = $this->queryPagination($data['pagination']);
+
+        if (empty($data['where'])) {
+            $data['where'] = [];
+        }
+        if (empty($data['orwhere'])) {
+            $data['orwhere'] = [];
+        }
+        $where = $this->queryWhereClause([
+            "where" => $data['where'],
+            "orwhere" => $data['orwhere']
+        ]);
+
+        $selectArr = [];
+        $selectArr[] = $this->table . ".id, " . $this->table . ".email, " . $this->table . ".role, " .  $this->table . ".created_at";
+        $selectArr[] = "authors.username, authors.id as author_id";
+
+        $joinArr = [];
+        $joinArr[] = "LEFT JOIN authors ON authors.user_id = " . $this->table . ".id";
+
+        $sql = "SELECT " . implode(", ", $selectArr) . " FROM " . $this->table . " " . implode(" ", $joinArr);
+
+        $sql = "SELECT * FROM ($sql) tbl $where $sort $limit";
+
+        if ($debug) {
+            print_r($sql);
+            die;
+        }
+
+        $query = $this->db->query($sql);
+        $query->execute();
+
+        return $query->fetchAll();
+    }
+
+    function getJoinAuthor($data, $debug = false)
+    {
+        if (empty($data['where'])) {
+            $data['where'] = [];
+        }
+        if (empty($data['orwhere'])) {
+            $data['orwhere'] = [];
+        }
+        $where = $this->queryWhereClause([
+            "where" => $data['where'],
+            "orwhere" => $data['orwhere']
+        ]);
+
+        $selectArr = [];
+        $selectArr[] = $this->table . ".id, " . $this->table . ".email, " . $this->table . ".role, " .  $this->table . ".created_at";
+        $selectArr[] = "authors.username, authors.id as author_id";
+
+        $joinArr = [];
+        $joinArr[] = "LEFT JOIN authors ON authors.user_id = " . $this->table . ".id";
+
+        $sql = "SELECT " . implode(", ", $selectArr) . " FROM " . $this->table . " " . implode(" ", $joinArr);
+
+        $sql = "SELECT * FROM ($sql) tbl $where";
+
+        if ($debug) {
+            print_r($sql);
+            die;
+        }
+
+        $query = $this->db->query($sql);
+        $query->execute();
+
+        return $query->fetch();
+    }
+
+    function getJoinAuthorTotal($data, $debug = false)
+    {
+        $where = $this->queryWhereClause([
+            "where" => $data['where'],
+            "orwhere" => $data['orwhere']
+        ]);
+
+        $selectArr = [];
+        $selectArr[] = $this->table . ".email, " . $this->table . ".role, " .  $this->table . ".created_at";
+        $selectArr[] = "authors.username";
+
+        $joinArr = [];
+        $joinArr[] = "LEFT JOIN authors ON authors.user_id = " . $this->table . ".id";
+
+        $sql = "SELECT " . implode(", ", $selectArr) . " FROM " . $this->table . " " . implode(" ", $joinArr);
+
+        $sql = "SELECT COUNT(*) as total FROM ($sql) tbl $where";
+
+        if ($debug) {
+            print_r($sql);
+            die;
+        }
+
+        $query = $this->db->query($sql);
+        $query->execute();
+
+        return $query->fetch();
     }
 
     //     public function insertWithPassword($data)

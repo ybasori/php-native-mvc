@@ -1,13 +1,6 @@
 <div class="container">
     <div class="row">
         <div class="col-sm-12">
-            <div class="pull-right">
-                <button class="btn btn-default" type="button" onclick="removeAuth()">Logout</button>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-12">
             <input id="path" class="form-control" value="/json/v1/custom<?= $path->realpath ?>" readonly />
         </div>
     </div>
@@ -191,7 +184,7 @@
     </div>
     <div class="row" id="data-single" style="display:none">
         <div class="col-sm-12">
-            <a href="/admin<?= $path->full_path ?>" class="btn btn-default">to Index</a>
+            <a href="/admin/try<?= $path->full_path ?>" class="btn btn-default">to Index</a>
             <form id="edit-form" onsubmit="onSubmitEdit(event)">
                 <div class="panel panel-default">
                     <div class="panel-heading">
@@ -246,6 +239,11 @@
                 <button type="submit" id="editSubmit" style="display:none"></button>
             </form>
             <button type="button" class="btn btn-primary" onclick="document.getElementById('editSubmit').click()">Save changes</button>
+        </div>
+    </div>
+    <div class="row" id="relogin" style="display:none">
+        <div class="col-md-12">
+            <button class="btn btn-default" type="button" onclick="removeAuth()">Login</button>
         </div>
     </div>
 </div>
@@ -347,6 +345,7 @@
     </div>
 </div>
 
+
 <script>
     var deleteId = "";
     var total = 0;
@@ -373,9 +372,10 @@
         } else {
             search = {
                 ...search,
-                [name]: `%${e.target[name = name].value}%`
+                [name]: encodeURI(`%${e.target[name = name].value}%`)
             }
         }
+
         getArr = {
             ...getArr,
             search
@@ -465,7 +465,20 @@
         var path = document.getElementById("path").value;
         var actualpath = `${path}`.substring(15);
 
-        var querySearch = <?= json_encode(count($_GET) > 0 ? $_GET : (object) []) ?>;
+        Object.keys(search).forEach(function(key) {
+            search[key] = encodeURI(search[key]);
+        })
+        var querySearch = {
+            search,
+            sort,
+            limit,
+            page
+        }
+
+        if (querySearch.limit == "all") {
+            delete querySearch.limit;
+            delete querySearch.page;
+        }
 
         var querySearchExp = expandJSON(querySearch);
 
@@ -486,7 +499,14 @@
                 "Authorization": `Bearer ${getAuth().token}`
             }
         }).then(function(res) {
-            return res.json()
+
+            if (res.status >= 200 && res.status < 300) {
+                return res.json()
+            }
+
+            if (res.status == 401) {
+                document.getElementById("relogin").style.display = "block"
+            }
         }).then(function(result) {
             total = result.data.total;
             var fields = <?= json_encode($fields) ?>;
@@ -514,7 +534,7 @@
                         <td>${item.created_at}</td>
                         <td>${item.updated_at}</td>
                         <td>${item.created_by}</td>
-                        <td><button class="btn btn-danger" type="button" onclick="selectedDeleteId('${actualpath}/${item.slug}')">Delete</button><a class="btn btn-default" href="/admin${actualpath}/${item.slug}" role="button">Open</a></td>
+                        <td><button class="btn btn-danger" type="button" onclick="selectedDeleteId('${actualpath}/${item.slug}')">Delete</button><a class="btn btn-default" href="/admin/try${actualpath}/${item.slug}" role="button">Open</a></td>
                     </tr>
                     `;
                     no++;

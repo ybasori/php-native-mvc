@@ -11,25 +11,57 @@ use App\Controllers\Controller;
 class CustomController extends Controller
 {
     private $path = "/json/v1/custom";
-    private function getDetail($path_id, $slug, $fields)
-    {
-
-        $dataItem = new DataItem;
-        $data = $dataItem->getJoinField($fields, [
-            "where" => [
-                ["path_id", "=", $path_id],
-                ["slug", "=", $slug]
-            ]
-        ]);
-        return $data;
-    }
 
     public function index()
     {
-        $path = new Path;
-        $data_path = $path->getAll([]);
 
-        return $this->json(["data" => $data_path]);
+        $pagination = [];
+        $sort = !empty($_GET['sort']) ? $_GET['sort'] : [];
+        if (!empty($_GET['page']) && !empty($_GET['limit'])) {
+            $pagination = array_merge($pagination, [
+                "page" => $_GET['page'],
+                "limit" => $_GET['limit'],
+            ]);
+        }
+        if (!empty($_GET['page']) && empty($_GET['limit'])) {
+            $pagination = array_merge($pagination, [
+                "page" => $_GET['page'],
+                "limit" => 10,
+            ]);
+        }
+        if (empty($_GET['page']) && !empty($_GET['limit'])) {
+            $pagination = array_merge($pagination, [
+                "page" => 1,
+                "limit" => $_GET['limit'],
+            ]);
+        }
+
+        $sort = count($sort) > 0 ? ["sort" => $sort] : [];
+        $pagination = count($pagination) > 0 ? ["pagination" => $pagination] : [];
+
+
+        $clause = [];
+
+        $path = new Path;
+        $data_path = $path->getAll(
+            array_merge(
+                array_merge(
+                    $clause,
+                    $pagination
+                ),
+                $sort
+            ),
+        );
+
+        $count = $path->getTotal($clause);
+
+        return $this->json([
+            "message" => "Data found",
+            "data" => [
+                "data" => $data_path,
+                "total" => $count->total
+            ]
+        ], 200);
     }
 
     public function show()
@@ -262,7 +294,12 @@ class CustomController extends Controller
                     ]);
                 }
             }
-            $data = $this->getDetail($cur['data']['path_id'], $dataItem['slug'], $fields);
+            $data = $di->getJoinField($fields, [
+                "where" => [
+                    ["path_id", "=", $cur['data']['path_id']],
+                    ["slug", "=", $$dataItem['slug']]
+                ]
+            ]);
             return $this->json([
                 "message" => "data found",
                 "data" => $data,

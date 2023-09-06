@@ -15,60 +15,6 @@ use UnexpectedValueException;
 class Controller extends Response
 {
 
-    private function matchingPath($requestPath, $prefix,  $fullpath, $affix)
-    {
-
-        $explodedFullpath = explode("/", $prefix . $fullpath . $affix);
-        if ($explodedFullpath[0] === "") {
-            unset($explodedFullpath[0]);
-        }
-        if ($explodedFullpath[count($explodedFullpath) - 1] === "") {
-            unset($explodedFullpath[count($explodedFullpath) - 1]);
-        }
-        $explodedReqPath = explode("/", $requestPath);
-        if ($explodedReqPath[0] === "") {
-            unset($explodedReqPath[0]);
-        }
-        if ($explodedReqPath[count($explodedReqPath) - 1] === "") {
-            unset($explodedReqPath[count($explodedReqPath) - 1]);
-        }
-
-
-        if (count($explodedFullpath) == count($explodedReqPath)) {
-            $correct = 0;
-            $newParams = [];
-            foreach ($explodedReqPath as $keyErp => $erp) {
-                if ($explodedFullpath[$keyErp] === $erp) {
-                    $correct += 1;
-                } else {
-                    if (substr($explodedFullpath[$keyErp], 0, 1) == ":") {
-                        $newParams[substr($explodedFullpath[$keyErp], 1, strlen($explodedFullpath[$keyErp]))] = $erp;
-                        $correct += 1;
-                    }
-                }
-            }
-            if (count($explodedReqPath) == $correct) {
-                return [
-                    "path" => $fullpath,
-                    "fullpath" => $fullpath . $affix,
-                    "matched" => true,
-                    "params" => $newParams
-                ];
-            }
-            return [
-                "path" => "",
-                "fullpath" => "",
-                "matched" => false,
-                "params" => []
-            ];
-        }
-        return [
-            "path" => "",
-            "fullpath" => "",
-            "matched" => false,
-            "params" => []
-        ];
-    }
     public function getSelectedPath($prefix)
     {
         $requestUri = parse_url($_SERVER['REQUEST_URI']);

@@ -105,16 +105,16 @@
 
         function removeAuth() {
             localStorage.removeItem("auth")
-            window.location.reload()
+            window.location.href = "/admin/login?redirect=" + encodeURI(window.location.pathname + window.location.search)
         }
 
         if (!getAuth()) {
-            if (window.location.pathname + window.location.search !== "/admin?p=login") {
-                window.location.href = "/admin?p=login"
+            if (window.location.pathname !== "/admin/login") {
+                window.location.href = "/admin/login" + window.location.search
             }
         } else {
-            if (window.location.pathname + window.location.search === "/admin?p=login") {
-                window.location.href = "/admin"
+            if (window.location.pathname === "/admin/login") {
+                window.location.href = "/admin" + window.location.search
             }
         }
     </script>

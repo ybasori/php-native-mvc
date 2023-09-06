@@ -52,8 +52,8 @@ class Model
         $whereArr = [];
 
         foreach ($value['where'] as $item) {
-            if ($item[2] !== "") {
-                if ($item[3] == true) {
+            if (!empty($item[2])) {
+                if (!empty($item[3]) && $item[3] == true) {
                     $whereArr[] = " " . $item[0] . " " . $item[1] . " " . $item[2];
                 } else {
                     $item[2] = "'$item[2]'";
@@ -74,10 +74,10 @@ class Model
             }
         }
         if (count($whereArr) > 0) {
-            $where[] = implode(" AND ", $whereArr);
+            $where[] = "(" . implode(" AND ", $whereArr) . ")";
         }
         if (count($orWhereArr) > 0) {
-            $where[] = implode(" OR ", $orWhereArr);
+            $where[] = "(" . implode(" OR ", $orWhereArr) . ")";
         }
 
         if (count($where) > 0) {
@@ -90,6 +90,12 @@ class Model
     public function get($data, $debug = false)
     {
 
+        if (empty($data['where'])) {
+            $data['where'] = [];
+        }
+        if (empty($data['orwhere'])) {
+            $data['orwhere'] = [];
+        }
         $where = $this->queryWhereClause([
             "where" => $data['where'],
             "orwhere" => $data['orwhere']
@@ -115,6 +121,12 @@ class Model
 
         $limit = $this->queryPagination($data['pagination']);
 
+        if (empty($data['where'])) {
+            $data['where'] = [];
+        }
+        if (empty($data['orwhere'])) {
+            $data['orwhere'] = [];
+        }
         $where = $this->queryWhereClause([
             "where" => $data['where'],
             "orwhere" => $data['orwhere']
@@ -123,6 +135,7 @@ class Model
         $sql = "SELECT * FROM $this->table $where $sort $limit";
 
         if ($debug) {
+            http_response_code(500);
             print_r($sql);
             die;
         }
@@ -136,6 +149,12 @@ class Model
     public function getTotal($data)
     {
 
+        if (empty($data['where'])) {
+            $data['where'] = [];
+        }
+        if (empty($data['orwhere'])) {
+            $data['orwhere'] = [];
+        }
         $where = $this->queryWhereClause([
             "where" => $data['where'],
             "orwhere" => $data['orwhere']
@@ -211,12 +230,19 @@ class Model
 
         try {
 
+            if (empty($data['where'])) {
+                $data['where'] = [];
+            }
+            if (empty($data['orwhere'])) {
+                $data['orwhere'] = [];
+            }
             $where = $this->queryWhereClause([
                 "where" => $data['where'],
                 "orwhere" => $data['orwhere']
             ]);
             $sql = "DELETE FROM $this->table $where";
             if ($debug) {
+                http_response_code(500);
                 print_r($sql);
                 die;
             }
@@ -239,7 +265,7 @@ class Model
         }
 
         $impValue = implode("-", $expValue);
-        $query = $this->db->query("SELECT $column, origin, number FROM (SELECT $column, cast(replace(replace($column, '$impValue',''),'-','') as int) as number, replace(replace($column, cast(replace(replace($column, '$impValue',''),'-','') as int),''),'-','') as origin FROM $this->table WHERE $column like '$impValue%') tbl WHERE origin='$impValue' ORDER BY number DESC; LIMIT 1");
+        $query = $this->db->query("SELECT id, $column, origin, number FROM (SELECT id, $column, cast(replace(replace($column, '$impValue',''),'-','') as int) as number, replace(replace($column, cast(replace(replace($column, '$impValue',''),'-','') as int),''),'-','') as origin FROM $this->table WHERE $column like '$impValue%') tbl WHERE origin='$impValue' ORDER BY number DESC; LIMIT 1");
 
 
 

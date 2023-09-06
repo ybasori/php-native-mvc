@@ -169,26 +169,28 @@ class AdminController extends Controller
         return $this->json(["id" => $_GET['id'], "data" => $_PUT]);
     }
 
-    public function delete()
+    public function delete($params)
     {
 
         $path = new Path;
-        $allPathIds = [$_GET['id']];
-        $scanChildPathIds = [$_GET['id']];
+        $allPathIds = [$params->id];
+        $scanChildPathIds = [$params->id];
         $searching = true;
         while ($searching) {
             $storeChildPathIds = [];
 
             if (count($scanChildPathIds) > 0) {
                 foreach ($scanChildPathIds as $pathId) {
-                    $data = $path->getAll([
-                        "where" => [
-                            ["parent_id", "=", $pathId]
-                        ]
-                    ]);
+                    if (!empty($pathId)) {
+                        $data = $path->getAll([
+                            "where" => [
+                                ["parent_id", "=", $pathId]
+                            ]
+                        ]);
 
-                    foreach ($data as $dt) {
-                        $storeChildPathIds[] = $dt->id;
+                        foreach ($data as $dt) {
+                            $storeChildPathIds[] = $dt->id;
+                        }
                     }
                 }
                 $scanChildPathIds = $storeChildPathIds;
@@ -200,33 +202,37 @@ class AdminController extends Controller
 
         $df = new DataField;
 
-        $df->delete([
-            "where" => [
-                ["path_id", "IN", "(" . implode(",", $allPathIds) . ")", true]
-            ]
-        ]);
+        $allPathIds = array_filter($allPathIds);
 
-        $di = new DataItem;
+        if (count($allPathIds) > 0) {
+            $df->delete([
+                "where" => [
+                    ["path_id", "IN", "(" . implode(",", $allPathIds) . ")", true]
+                ]
+            ]);
 
-        $di->delete([
-            "where" => [
-                ["path_id", "IN", "(" . implode(",", $allPathIds) . ")", true]
-            ]
-        ]);
+            $di = new DataItem;
 
-        $field = new FieldForm;
+            $di->delete([
+                "where" => [
+                    ["path_id", "IN", "(" . implode(",", $allPathIds) . ")", true]
+                ]
+            ]);
 
-        $field->delete([
-            "where" => [
-                ["path_id", "IN", "(" . implode(",", $allPathIds) . ")", true]
-            ]
-        ]);
+            $field = new FieldForm;
 
-        $path->delete([
-            "where" => [
-                ["id", "IN", "(" . implode(",", $allPathIds) . ")", true]
-            ]
-        ]);
+            $field->delete([
+                "where" => [
+                    ["path_id", "IN", "(" . implode(",", $allPathIds) . ")", true]
+                ]
+            ]);
+
+            $path->delete([
+                "where" => [
+                    ["id", "IN", "(" . implode(",", $allPathIds) . ")", true]
+                ]
+            ]);
+        }
         return $this->json(["id" => $_GET['id']]);
     }
 }
